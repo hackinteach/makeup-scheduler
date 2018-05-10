@@ -11,10 +11,10 @@
   },
   "dependencies": {
     "@mdi/font": "^2.3.54",
+    "date-fns": "^1.29.0",
     "firebase": "^5.0.1",
     "vue": "^2.5.2",
     "vue-router": "^3.0.1",
-    "vue2-daterange-picker": "^0.0.4",
     "vuetify": "^1.0.0"
   },
   "devDependencies": {
