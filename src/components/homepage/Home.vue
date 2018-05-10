@@ -16,10 +16,12 @@
 <script>
   import AddSession from './AddSession';
   import JoinSession from "./JoinSession";
+  import Session from "./Session";
   export default {
     components: {
       JoinSession,
       AddSession,
+
     }
   }
 </script>
