@@ -1,13 +1,11 @@
 <template>
   <v-container :style="{marginTop:'2em'}" grid-list-xs text-xs-center>
     <v-layout row wrap>
-      <v-flex xs6>
+      <v-flex d-flex xs12 md6 fill-height>
         <AddSession/>
       </v-flex>
-      <v-flex xs6>
-        <div class="text-xs-center mt-3">
-          <JoinSession/>
-        </div>
+      <v-flex xs12 md6 fill-height>
+        <JoinSession/>
       </v-flex>
     </v-layout>
   </v-container>
@@ -16,6 +14,7 @@
 <script>
   import AddSession from './AddSession';
   import JoinSession from "./JoinSession";
+
   export default {
     components: {
       JoinSession,

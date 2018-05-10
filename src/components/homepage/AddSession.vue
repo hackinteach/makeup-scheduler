@@ -44,12 +44,12 @@
             v-model="startDate"
             no-title
             @input="menu1 = false"
-          />
+          ></v-date-picker>
         </v-menu>
         <v-menu
-          ref="menu1"
+          ref="menu2"
           :close-on-content-click="false"
-          v-model="menu1"
+          v-model="menu2"
           :nudge-right="40"
           lazy
           transition="scale-transition"
@@ -70,7 +70,7 @@
           <v-date-picker
             v-model="endDate"
             no-title
-            @input="menu1 = false"/>
+            @input="menu2 = false"/>
         </v-menu>
         <v-text-field
           name="description"
@@ -89,6 +89,7 @@
 </template>
 
 <script>
+
   export default {
     data: () => ({
       startDate: null,
@@ -97,6 +98,7 @@
       endDateFormatted: null,
       description: '',
       menu1: false,
+      menu2: false,
       valid: false,
       email: '',
       emailRule: [
