@@ -6,9 +6,7 @@
       </v-flex>
       <v-flex xs6>
         <div class="text-xs-center mt-3">
-          <v-btn outline large block color="deep-purple darken-3">
-            <v-icon x-large >group</v-icon>
-          </v-btn>
+          <JoinSession/>
         </div>
       </v-flex>
     </v-layout>
@@ -17,8 +15,10 @@
 
 <script>
   import AddSession from './AddSession';
+  import JoinSession from "./JoinSession";
   export default {
     components: {
+      JoinSession,
       AddSession
     }
   }

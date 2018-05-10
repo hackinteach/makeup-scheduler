@@ -97,7 +97,7 @@
       endDateFormatted: null,
       description: '',
       menu1: false,
-      valid: true,
+      valid: false,
       email: '',
       emailRule: [
         v => !!v || 'E-mail is required',
