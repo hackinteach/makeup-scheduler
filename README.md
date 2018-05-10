@@ -1,3 +1,5 @@
+![Deployment](https://circleci.com/bb/suffer4life/hackathon2.svg?style=shield&circle-token=:circle-token)
+
 # makeup-scheduler
 
 > A Vue.js project
