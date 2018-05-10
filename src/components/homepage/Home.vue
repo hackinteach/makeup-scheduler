@@ -1,14 +1,16 @@
 <template>
-  <v-container :style="{marginTop:'2em'}" grid-list-xs text-xs-center>
-    <v-layout row wrap>
-      <v-flex d-flex xs12 md6 fill-height>
-        <AddSession/>
-      </v-flex>
-      <v-flex xs12 md6 fill-height>
-        <JoinSession/>
-      </v-flex>
-    </v-layout>
-  </v-container>
+    <v-container row wrap grid-list-xs text-xs-center :style="{minHeight: '100%',minWidth: '100%'}">
+      <v-layout row wrap >
+        <v-layout fill-height row wrap>
+          <v-flex class="my-flex" xs12 md6 :style="{backgroundColor:'white'}">
+            <AddSession/>
+          </v-flex>
+          <v-flex class="my-flex" xs12 md6 :style="{backgroundColor:'gray'}">
+            <JoinSession/>
+          </v-flex>
+        </v-layout>
+      </v-layout>
+    </v-container>
 </template>
 
 <script>
@@ -18,7 +20,7 @@
   export default {
     components: {
       JoinSession,
-      AddSession
+      AddSession,
     }
   }
 </script>
@@ -42,4 +44,10 @@
   a {
     color: #42b983;
   }
+
+  .my-flex {
+    min-height: 100%;
+    padding: 2em;
+  }
+
 </style>

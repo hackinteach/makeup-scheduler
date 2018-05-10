@@ -1,5 +1,5 @@
 <template>
-  <v-card :style="{margin:'1em', padding: '1.5em'}">
+  <v-card :style="{margin:'4em', padding: '1.5em'}">
     <v-toolbar-title>Join Session</v-toolbar-title>
     <v-form
       ref="form"
