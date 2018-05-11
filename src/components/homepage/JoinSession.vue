@@ -49,6 +49,16 @@
     data: () => ({
       valid: false,
       code: '',
+      username: '',
+      password: '',
+      passwordRule: [
+        v => !!v || 'Password is required',
+        v => /^......*$/.test(v) || 'Password too weak'
+      ],
+      usernameRule: [
+        v => !!v || 'Username is required',
+        v => /^[A-Za-z0-9]+(?:[ _-][A-Za-z0-9]+)*$/.test(v) || 'Invalid username'
+      ],
       codeRule: [
         c => /^[a-zA-Z0-9_.-]*$/.test(c) || 'Code must be alphabet or number'
       ]
@@ -57,6 +67,12 @@
     watch: {
       valid(){
         this.valid = this.$refs.form.validate();
+      },
+    },
+
+    methods: {
+      join() {
+
       }
     }
   }
