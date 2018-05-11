@@ -14,6 +14,7 @@
     "date-fns": "^1.29.0",
     "firebase": "^5.0.1",
     "vue": "^2.5.2",
+    "vue-qrcode-component": "^2.1.1",
     "vue-router": "^3.0.1",
     "vuetify": "^1.0.0"
   },
