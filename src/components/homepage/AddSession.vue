@@ -34,7 +34,7 @@
           label="Email"
           required
         />
-        <p class="caption text-xs-left" >We will send the join code via email.</p>
+        <p class="caption">We will send the join code via email.</p>
         <v-spacer/>
       </v-container>
       <v-subheader class="sub-header">
@@ -48,6 +48,14 @@
           label="Class name"
           required
         />
+        <v-select
+          :items="periods"
+          v-model="classPeriod"
+          label="Class Period"
+          class=""
+          item-value="text"
+          single-line
+        ></v-select>
         <v-menu
           ref="menu1"
           :close-on-content-click="false"
@@ -119,17 +127,29 @@
 </template>
 
 <script>
+  import {auth, db} from '../../firebase';
+  import firebase from 'firebase';
+  import router from "vue-router";
 
   export default {
     data: () => ({
-      startDate: null,
-      startDateFormatted: null,
-      endDate: null,
-      endDateFormatted: null,
+      startDate: '',
+      startDateFormatted: '',
+      endDate: '',
+      endDateFormatted: '',
       description: '',
+      username: '',
+      password: '',
       menu1: false,
       menu2: false,
       valid: false,
+      classPeriod: 0,
+      periods: [
+        {text: 1},
+        {text: 2},
+        {text: 3},
+        {text: 4}
+      ],
       email: '',
       emailRule: [
         v => !!v || 'E-mail is required',
@@ -140,9 +160,11 @@
         v => !!v || 'Class name is required'
       ],
       passwordRule: [
+        v => !!v || 'Password is required',
         v => /^......*$/.test(v) || 'Password too weak'
       ],
       usernameRule: [
+        v => !!v || 'Username is required',
         v => /^[A-Za-z0-9]+(?:[ _-][A-Za-z0-9]+)*$/.test(v) || 'Invalid username'
       ]
     }),
@@ -167,15 +189,54 @@
         return `${day}/${month}/${year}`
       },
       parseDate(date) {
-        if (!date) return null;
+        if (!date) return '';
 
         const [month, day, year] = date.split('/');
         return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`
       },
-      submit() {
+      submit(e) {
+        e.preventDefault();
         if (this.$refs.form.validate()) {
-          console.log("Submitted");
+          const {classPeriod, startDateFormatted, endDateFormatted, description, email, subject, username, password} = this.$data;
+          auth.createUserWithEmailAndPassword(email, password)
+            .then(() => {
+              const user = auth.currentUser.uid;
+              const sid = Math.random().toString(36).substring(2, 8) + Math.random().toString(36).substring(2, 5);
+              const dbRefs = db.ref('session/'+subject );
+              dbRefs.push(
+                /* Session object */
+                {
+                  startDate: startDateFormatted,
+                  endDate: endDateFormatted,
+                  description: description,
+                  owner: {
+                    uid: user,
+                    username: username,
+                    email: email,
+                  },
+                  classPeriod: classPeriod,
+                  users: [],
+                  id: sid,
+                })
+                .then(
+                  snapshot => {
+                    this.$router.push(
+                      {
+                        path: 'info',
+                        query:
+                          {
+                            id: sid,
+                            name: subject
+                          }
+                      }
+                    )
+                  }
+                )
+                .catch(err => alert(err))
+                .catch(err => alert(err));
+            })
         }
+
       }
     }
   }
