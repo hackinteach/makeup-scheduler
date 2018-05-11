@@ -2,10 +2,10 @@
     <v-container row wrap grid-list-xs text-xs-center :style="{minHeight: '100%',minWidth: '100%'}">
       <v-layout row wrap >
         <v-layout fill-height row wrap>
-          <v-flex class="my-flex" xs12 md6 :style="{backgroundColor:'white'}">
+          <v-flex class="my-flex" xs12 md6 :style="{backgroundImage: `url(${require('../../assets/bg/l.jpg')})`,backgroundPosition: 'right center'}">
             <AddSession/>
           </v-flex>
-          <v-flex class="my-flex" xs12 md6 :style="{backgroundColor:'gray'}">
+          <v-flex class="my-flex" xs12 md6 :style="{backgroundImage: `url(${require('../../assets/bg/r.jpg')})`,  backgroundPosition: 'center center'}">
             <JoinSession/>
           </v-flex>
         </v-layout>

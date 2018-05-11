@@ -1,18 +1,47 @@
 <template>
-    <v-card :style="{margin:'4em', padding: '1.5em'}">
-      <v-toolbar-title>Create Session</v-toolbar-title>
-      <v-form
-        ref="form"
-        v-model="valid"
-        lazy-validation
-        :style="{margin:'1em'}"
-      >
+  <v-card :style="{backgroundColor: 'rgba(255,255,255,0.9)', margin:'4em', padding: '1.5em'}">
+    <v-toolbar-title>Create Session</v-toolbar-title>
+
+    <v-form
+      ref="form"
+      v-model="valid"
+      lazy-validation
+      :style="{margin:'1em'}"
+    >
+      <v-subheader class="sub-header">
+        User account
+      </v-subheader>
+      <v-divider/>
+      <v-container row wrap xs6 text-xs-center class="form-container">
+        <v-text-field
+          v-model="username"
+          :rules="usernameRule"
+          label="Username"
+          hint="A-Z, a-z, 0-9, - , _"
+          required
+        />
+        <v-text-field
+          v-model="password"
+          :rules="passwordRule"
+          label="Password"
+          hint="at least 6 characters"
+          required
+          type="password"
+        />
         <v-text-field
           v-model="email"
           :rules="emailRule"
           label="Email"
           required
         />
+        <p class="caption text-xs-left" >We will send the join code via email.</p>
+        <v-spacer/>
+      </v-container>
+      <v-subheader class="sub-header">
+        Class details
+      </v-subheader>
+      <v-divider/>
+      <v-container row wrap xs6 text-xs-center class="form-container">
         <v-text-field
           v-model="subject"
           :rules="subjectRule"
@@ -84,8 +113,9 @@
         >
           create
         </v-btn>
-      </v-form>
-    </v-card>
+      </v-container>
+    </v-form>
+  </v-card>
 </template>
 
 <script>
@@ -109,6 +139,12 @@
       subjectRule: [
         v => !!v || 'Class name is required'
       ],
+      passwordRule: [
+        v => /^......*$/.test(v) || 'Password too weak'
+      ],
+      usernameRule: [
+        v => /^[A-Za-z0-9]+(?:[ _-][A-Za-z0-9]+)*$/.test(v) || 'Invalid username'
+      ]
     }),
 
     watch: {
@@ -144,3 +180,13 @@
     }
   }
 </script>
+
+<style scoped>
+  .sub-header {
+    color: midnightblue;
+  }
+
+  .form-container {
+    padding: 2em;
+  }
+</style>
