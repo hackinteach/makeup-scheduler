@@ -38,7 +38,7 @@ export default new Router({
       component: Home
     },
     {
-      path: '/session',
+      path: '/session/:id',
       name: 'Session',
       component: Session,
       beforeEnter: AuthGuard
