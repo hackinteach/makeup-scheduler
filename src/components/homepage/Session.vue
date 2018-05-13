@@ -34,21 +34,39 @@
               <v-card dark color="primary">
                 <v-card-text class="px-0">{{ day.name }}</v-card-text>
               </v-card>
+
+
+
+              <template v-for="timeslot in timeslots">
+                <!--<v-flex xs2>-->
+                <!--<v-card>-->
+                <!--<v-card-text class="px-0">{{ timeslot.start }}~</v-card-text>-->
+                <!--</v-card>-->
+                <!--</v-flex>-->
+                  <v-card>
+                    <v-card-text class="px-0">{{ timeslot.start }}~</v-card-text>
+
+                    <!--<v-card-text class="px-0" @drop="dropLesson($event, day, timeslot)" @dragover="allowDrop" v-html="content(day, timeslot )"></v-card-text>-->
+                  </v-card>
+              </template>
+
+
+
             </v-flex>
-            <template v-for="timeslot in timeslots">
-              <!--<v-flex xs2>-->
+            <!--<template v-for="timeslot in timeslots">-->
+              <!--&lt;!&ndash;<v-flex xs2>&ndash;&gt;-->
+                <!--&lt;!&ndash;<v-card>&ndash;&gt;-->
+                  <!--&lt;!&ndash;<v-card-text class="px-0">{{ timeslot.start }}~</v-card-text>&ndash;&gt;-->
+                <!--&lt;!&ndash;</v-card>&ndash;&gt;-->
+              <!--&lt;!&ndash;</v-flex>&ndash;&gt;-->
+              <!--<v-flex xs2 v-for="day in days" :key="day.id + '' + timeslot.id ">-->
                 <!--<v-card>-->
                   <!--<v-card-text class="px-0">{{ timeslot.start }}~</v-card-text>-->
+
+                  <!--&lt;!&ndash;<v-card-text class="px-0" @drop="dropLesson($event, day, timeslot)" @dragover="allowDrop" v-html="content(day, timeslot )"></v-card-text>&ndash;&gt;-->
                 <!--</v-card>-->
               <!--</v-flex>-->
-              <v-flex xs2 v-for="day in days" :key="day.id + '' + timeslot.id ">
-                <v-card>
-                  <v-card-text class="px-0">{{ timeslot.start }}~</v-card-text>
-
-                  <!--<v-card-text class="px-0" @drop="dropLesson($event, day, timeslot)" @dragover="allowDrop" v-html="content(day, timeslot )"></v-card-text>-->
-                </v-card>
-              </v-flex>
-            </template>
+            <!--</template>-->
           </v-layout>
         </v-container>
       </v-flex>
