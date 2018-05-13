@@ -42,12 +42,15 @@
                 <!--<v-card>-->
                 <!--<v-card-text class="px-0">{{ timeslot.start }}~</v-card-text>-->
                 <!--</v-card>-->
-                <!--</v-flex>-->
+                <v-flex v-on:click="getSlotId(day, timeslot)"
+                        v-bind:class="{'green': this}"
+                >
                   <v-card>
                     <v-card-text class="px-0">{{ timeslot.start }}~</v-card-text>
 
                     <!--<v-card-text class="px-0" @drop="dropLesson($event, day, timeslot)" @dragover="allowDrop" v-html="content(day, timeslot )"></v-card-text>-->
                   </v-card>
+                </v-flex>
               </template>
 
 
@@ -94,6 +97,9 @@
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+  green{
+    background-color: #41B883;
+  }
   [draggable] {
     -moz-user-select: none;
     -webkit-user-select: none;
@@ -107,6 +113,19 @@
 
 <script>
   export default {
+    makeColors(){
+      var lst = []
+      for (var i=0;i<6;i++){
+        lst.add([]);
+      };
+      for (var i=0;i<6;i++){
+        for (var j=0;j<12;j++){
+          lst[i].add(false);
+        }
+      };
+      return lst;
+    },
+
     data () {
       return {
         timetable: [],
@@ -242,10 +261,21 @@
             'id': 8,
             'name': 'UF3'
           }
-        ]
+        ],
       }
     },
+    //========================
     methods: {
+
+      // isClicked(){
+      //
+      // }
+
+      getSlotId (day, timeslot){
+        console.log(day.id+"-> "+timeslot.id)
+        // console.log(this.colors)
+      },
+
       addLesson () {
         const newLesson = {
           'name': this.newLessonName,
