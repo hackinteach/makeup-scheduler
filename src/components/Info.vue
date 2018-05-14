@@ -6,9 +6,19 @@
         <v-flex xs12 sm8>
           <v-card raised class="my-card">
             <p class="headline">Class Summary</p>
+            <!-- CODE -->
+            <a class="subheading" :style="{color: 'black'}">Join Code</a>
+            <v-flex xs12>
+              <v-card :flat="true" color="grey lighten-2">
+                <a class="display-3">
+                  {{session.id}}
+                </a>
+              </v-card>
+            </v-flex>
+            <v-divider class="divider"/>
             <!-- URL -->
             <v-icon>insert_link</v-icon>
-            <a class="subheading"> Share this link to your members</a>
+            <a class="subheading" :style="{color: 'black'}"> Share this link to your members</a>
             <v-flex>
               <a class="body-1" :href="'https://'+url">https://{{url}}</a>
             </v-flex>
@@ -41,9 +51,13 @@
                 </v-chip>
               </template>
             </v-select>
+            <v-btn :disabled="emailEmpty" @click="sendMail">
+              <v-icon color="grey darken-2">send</v-icon>
+            </v-btn>
+            <v-divider class="divider"/>
             <v-btn
-              @click="sendEmail">
-              send
+              @click="next">
+              next
             </v-btn>
           </v-card>
         </v-flex>
@@ -56,6 +70,7 @@
 <script>
   import {db} from '../firebase';
   import QRCode from "vue-qrcode-component";
+  import sendEmail from '../mail-sender';
 
   export default {
     components: {QRCode},
@@ -63,6 +78,7 @@
       session: null,
       url: '',
       emails: [],
+      emailEmpty: true,
     }),
 
     beforeCreate() {
@@ -87,14 +103,33 @@
         })
     },
 
+    watch: {
+      emails(){
+        this.emailEmpty = this.emails.length === 0;
+      }
+    },
+
     methods: {
       remove(item) {
         this.chips.splice(this.chips.indexOf(item), 1);
         this.chips = [...this.chips]
       },
 
-      sendEmail() {
+      sendMail(e) {
+        e.preventDefault();
+        const link = 'https://'+this.url;
+        const {id,owner} = this.session;
+        const {username,email} = owner;
+        console.log(this.emails);
+        this.emails.forEach(mail => {
+          //  {code,receivers, url, senderEmail, senderName}
+          console.log(mail);
+          sendEmail(id,mail, link, email, username);
+        })
+      },
 
+      next() {
+        this.$router.push("/session/"+this.session.id)
       }
     },
   }
