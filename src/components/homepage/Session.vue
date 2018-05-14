@@ -43,7 +43,7 @@
                 <!--<v-card-text class="px-0">{{ timeslot.start }}~</v-card-text>-->
                 <!--</v-card>-->
                 <v-flex v-on:click="getSlotId(day, timeslot)"
-                        v-bind:class="{'green': this}"
+                        v-bind:class="{'green' : findIsClicked(day, timeslot) >= 0}"
                 >
                   <v-card>
                     <v-card-text class="px-0">{{ timeslot.start }}~</v-card-text>
@@ -113,18 +113,6 @@
 
 <script>
   export default {
-    makeColors(){
-      var lst = []
-      for (var i=0;i<6;i++){
-        lst.add([]);
-      };
-      for (var i=0;i<6;i++){
-        for (var j=0;j<12;j++){
-          lst[i].add(false);
-        }
-      };
-      return lst;
-    },
 
     data () {
       return {
@@ -262,18 +250,37 @@
             'name': 'UF3'
           }
         ],
+        clicked: [{
+          'dayId' : 0, 'timeId': 0
+        }]
       }
     },
     //========================
     methods: {
 
-      // isClicked(){
-      //
-      // }
+      findIsClicked(day, timeslot){
+        var i;
+        for (i=0; i < this.clicked.length; i++){
+          // console.log(slot)
+          if (this.clicked[i]['dayId'] == day.id && this.clicked[i]['timeId'] == timeslot.id){
+            // console.log("true")
+            // console.log(this.clicked[i]['dayId'])
+            return i;
+          }
+        }
+        return -1;
+      },
 
       getSlotId (day, timeslot){
+        // console.log(this.clicked)
         console.log(day.id+"-> "+timeslot.id)
-        // console.log(this.colors)
+        const idx = this.findIsClicked(day, timeslot)
+        if (idx >= 0){
+          this.clicked.splice(idx, 1)
+        }
+        else{
+          this.clicked.push({'dayId': day.id, 'timeId': timeslot.id})
+        }
       },
 
       addLesson () {
