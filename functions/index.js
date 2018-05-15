@@ -16,6 +16,7 @@
 'use strict';
 
 const functions = require('firebase-functions');
+const firebase = require('firebase');
 const nodemailer = require('nodemailer');
 // Configure the email transport using the default SMTP transport and a GMail account.
 // For Gmail, enable these:
@@ -103,7 +104,20 @@ function sendGoodbyEmail(email, displayName) {
 */
 exports.fireEmail = functions.database.ref("/emailProxy").onCreate(
   snapshot => {
+    // {key: <email>}
     const email = snapshot.val();
-    console.log(email);
+    console.log("email",email);
+    Object.keys(email).map(mId => {
+      console.log("mId",mId);
+      const m = email[mId];
+      console.log("mail is ",m);
+      fireTheEmail(m);
+      firebase.database().ref("/emailProxy").child(mId).remove()
+        .then(()=> console.log("removed",mId));
+    });
   }
-)
+);
+
+const fireTheEmail = (email) => {
+  console.log("Sending the email to "+email);
+}

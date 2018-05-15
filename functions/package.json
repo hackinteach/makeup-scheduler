@@ -2,9 +2,10 @@
   "name": "email-user-function",
   "description": "Send an email to new users and users who delete their account",
   "dependencies": {
-    "nodemailer": "^4.0.1",
+    "firebase": "^5.0.2",
     "firebase-admin": "~5.11.0",
-    "firebase-functions": "^1.0.0"
+    "firebase-functions": "^1.0.0",
+    "nodemailer": "^4.0.1"
   },
   "devDependencies": {
     "eslint": "^4.13.1",
