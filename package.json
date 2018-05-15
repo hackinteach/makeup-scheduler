@@ -10,9 +10,11 @@
     "build": "node build/build.js"
   },
   "dependencies": {
+    "@google-cloud/storage": "^1.6.0",
     "@mdi/font": "^2.3.54",
     "date-fns": "^1.29.0",
     "emailjs": "^2.0.0",
+    "express": "^4.16.3",
     "firebase": "^5.0.1",
     "vue": "^2.5.2",
     "vue-qrcode-component": "^2.1.1",
