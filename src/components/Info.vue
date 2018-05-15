@@ -68,9 +68,8 @@
 </template>
 
 <script>
-  import {db} from '../firebase';
+  import {db, func} from '../firebase';
   import QRCode from "vue-qrcode-component";
-  import sendEmail from '../mail-sender';
 
   export default {
     components: {QRCode},
@@ -104,7 +103,7 @@
     },
 
     watch: {
-      emails(){
+      emails() {
         this.emailEmpty = this.emails.length === 0;
       }
     },
@@ -115,21 +114,19 @@
         this.chips = [...this.chips]
       },
 
-      sendMail(e) {
-        e.preventDefault();
-        const link = 'https://'+this.url;
-        const {id,owner} = this.session;
-        const {username,email} = owner;
-        console.log(this.emails);
+      sendMail() {
+        const link = 'https://' + this.url;
+        const {id, owner} = this.session;
+        const {username, email: o_email} = owner;
+        const dbRefs = db.ref("/emailProxy");
         this.emails.forEach(mail => {
-          //  {code,receivers, url, senderEmail, senderName}
-          console.log(mail);
-          sendEmail(id,mail, link, email, username);
+          dbRefs.push(mail);
         })
+
       },
 
       next() {
-        this.$router.push("/session/"+this.session.id)
+        this.$router.push("/session/" + this.session.id)
       }
     },
   }
@@ -157,12 +154,12 @@
     margin: 1em 0 1em;
   }
 
-  .my-card{
+  .my-card {
     margin: 2em;
     padding: 2em;
   }
 
-  .bgImg{
+  .bgImg {
     background-image: url("../assets/bg/2.jpg");
     min-height: 100%;
     background-size: cover;
