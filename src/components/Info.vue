@@ -122,7 +122,6 @@
         this.emails.forEach(mail => {
           dbRefs.push(mail);
         })
-
       },
 
       next() {
