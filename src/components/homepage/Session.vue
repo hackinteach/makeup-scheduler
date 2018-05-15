@@ -34,21 +34,42 @@
               <v-card dark color="primary">
                 <v-card-text class="px-0">{{ day.name }}</v-card-text>
               </v-card>
+
+
+
+              <template v-for="timeslot in timeslots">
+                <!--<v-flex xs2>-->
+                <!--<v-card>-->
+                <!--<v-card-text class="px-0">{{ timeslot.start }}~</v-card-text>-->
+                <!--</v-card>-->
+                <v-flex v-on:click="getSlotId(day, timeslot)"
+                        v-bind:class="{'green' : findIsClicked(day, timeslot) >= 0}"
+                >
+                  <v-card>
+                    <v-card-text class="px-0">{{ timeslot.start }}~</v-card-text>
+
+                    <!--<v-card-text class="px-0" @drop="dropLesson($event, day, timeslot)" @dragover="allowDrop" v-html="content(day, timeslot )"></v-card-text>-->
+                  </v-card>
+                </v-flex>
+              </template>
+
+
+
             </v-flex>
-            <template v-for="timeslot in timeslots">
-              <!--<v-flex xs2>-->
+            <!--<template v-for="timeslot in timeslots">-->
+              <!--&lt;!&ndash;<v-flex xs2>&ndash;&gt;-->
+                <!--&lt;!&ndash;<v-card>&ndash;&gt;-->
+                  <!--&lt;!&ndash;<v-card-text class="px-0">{{ timeslot.start }}~</v-card-text>&ndash;&gt;-->
+                <!--&lt;!&ndash;</v-card>&ndash;&gt;-->
+              <!--&lt;!&ndash;</v-flex>&ndash;&gt;-->
+              <!--<v-flex xs2 v-for="day in days" :key="day.id + '' + timeslot.id ">-->
                 <!--<v-card>-->
                   <!--<v-card-text class="px-0">{{ timeslot.start }}~</v-card-text>-->
+
+                  <!--&lt;!&ndash;<v-card-text class="px-0" @drop="dropLesson($event, day, timeslot)" @dragover="allowDrop" v-html="content(day, timeslot )"></v-card-text>&ndash;&gt;-->
                 <!--</v-card>-->
               <!--</v-flex>-->
-              <v-flex xs2 v-for="day in days" :key="day.id + '' + timeslot.id ">
-                <v-card>
-                  <v-card-text class="px-0">{{ timeslot.start }}~</v-card-text>
-
-                  <!--<v-card-text class="px-0" @drop="dropLesson($event, day, timeslot)" @dragover="allowDrop" v-html="content(day, timeslot )"></v-card-text>-->
-                </v-card>
-              </v-flex>
-            </template>
+            <!--</template>-->
           </v-layout>
         </v-container>
       </v-flex>
@@ -76,6 +97,9 @@
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+  green{
+    background-color: #41B883;
+  }
   [draggable] {
     -moz-user-select: none;
     -webkit-user-select: none;
@@ -89,6 +113,7 @@
 
 <script>
   export default {
+
     data () {
       return {
         timetable: [],
@@ -224,10 +249,40 @@
             'id': 8,
             'name': 'UF3'
           }
-        ]
+        ],
+        clicked: [{
+          'dayId' : 0, 'timeId': 0
+        }]
       }
     },
+    //========================
     methods: {
+
+      findIsClicked(day, timeslot){
+        var i;
+        for (i=0; i < this.clicked.length; i++){
+          // console.log(slot)
+          if (this.clicked[i]['dayId'] == day.id && this.clicked[i]['timeId'] == timeslot.id){
+            // console.log("true")
+            // console.log(this.clicked[i]['dayId'])
+            return i;
+          }
+        }
+        return -1;
+      },
+
+      getSlotId (day, timeslot){
+        // console.log(this.clicked)
+        console.log(day.id+"-> "+timeslot.id)
+        const idx = this.findIsClicked(day, timeslot)
+        if (idx >= 0){
+          this.clicked.splice(idx, 1)
+        }
+        else{
+          this.clicked.push({'dayId': day.id, 'timeId': timeslot.id})
+        }
+      },
+
       addLesson () {
         const newLesson = {
           'name': this.newLessonName,
