@@ -1,5 +1,6 @@
 <template>
   <v-container text-xs-center>
+    <!--<v-flex xs12>{{// db.ref()}}</v-flex>-->
     <v-layout row wrap>
       <v-flex xs12 class="my-flex">
 
@@ -82,11 +83,15 @@
 </template>
 
 <script>
+  import { db } from '../../firebase';
+  import Router from '../../router/index';
+
   export default {
 
     data () {
       return {
         timetable: [],
+        sessionCode: this.$route.params.id,
         newLessonName: '',
         newLessonDay: 0,
         newLessonTimeslot: 0,
