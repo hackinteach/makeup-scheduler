@@ -16,7 +16,6 @@
 'use strict';
 
 const functions = require('firebase-functions');
-const firebase = require('firebase');
 const nodemailer = require('nodemailer');
 // Configure the email transport using the default SMTP transport and a GMail account.
 // For Gmail, enable these:
@@ -36,7 +35,7 @@ const mailTransport = nodemailer.createTransport({
 
 // Your company name to include in the emails
 // TODO: Change this to your app or company name to customize the email sent.
-const APP_NAME = 'Makeup-Scheduler Code Confirmation Email';
+const APP_NAME = 'Makeup-Scheduler';
 
 // [START sendWelcomeEmail]
 /**
@@ -102,22 +101,34 @@ function sendGoodbyEmail(email, displayName) {
 /*
 * Send Email to each email in firestore when new email is added
 */
-exports.fireEmail = functions.database.ref("/emailProxy").onCreate(
-  snapshot => {
+exports.fireEmail = functions.database.ref("/emailProxy").onUpdate(
+  change => {
     // {key: <email>}
-    const email = snapshot.val();
-    console.log("email",email);
-    Object.keys(email).map(mId => {
-      console.log("mId",mId);
-      const m = email[mId];
-      console.log("mail is ",m);
-      fireTheEmail(m);
-      firebase.database().ref("/emailProxy").child(mId).remove()
-        .then(()=> console.log("removed",mId));
+    console.log(gmailEmail,gmailPassword);
+    const emails = change.after.val();
+    Object.keys(emails).map(mId => {
+      fireTheEmail(emails[mId]);
     });
+    return change.after.ref.remove();
   }
+
 );
 
-const fireTheEmail = (email) => {
-  console.log("Sending the email to "+email);
+const fireTheEmail = (session) => {
+  const {owner, link, code,mail} = session;
+  console.log("data",owner,link,code,mail);
+  const mailOptions = {
+    from: `${APP_NAME} <noreply@firebase.com>`,
+    to: mail,
+  };
+
+  // The user subscribed to the newsletter.
+  mailOptions.subject = `${owner} invite to join makeup session`;
+  mailOptions.html = `Please use code below to join the makeup session <br/>
+                       <h1 style="text-align:center">${code}</h1>
+                       <br/>
+                       or click this link: <h3 style="text-align:center"><a href="${link}">${link}</a></h3>`;
+  return mailTransport.sendMail(mailOptions).then(() => {
+    return console.log('Session code sent to:', mail);
+  });
 }
