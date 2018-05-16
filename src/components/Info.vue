@@ -5,7 +5,7 @@
         <v-flex sm2/>
         <v-flex xs12 sm8>
           <v-card raised class="my-card">
-            <p class="headline">Class Summary</p>
+            <p class="headline">Class Summary : {{session.name}}</p>
             <!-- CODE -->
             <a class="subheading" :style="{color: 'black'}">Join Code</a>
             <v-flex xs12>
@@ -68,9 +68,8 @@
 </template>
 
 <script>
-  import {db} from '../firebase';
+  import {db, func} from '../firebase';
   import QRCode from "vue-qrcode-component";
-  import sendEmail from '../mail-sender';
 
   export default {
     components: {QRCode},
@@ -84,7 +83,7 @@
     beforeCreate() {
       const sid = this.$route.query.id;
       const sname = this.$route.query.name;
-      const dbRef = db.ref('session/' + sname);
+      const dbRef = db.ref('session/' + sid);
 
       dbRef.once('value').then(snapshot => {
           if (snapshot.val() === null) {
@@ -97,46 +96,46 @@
           // console.log(sid, this.session);
         })
         .then(() => {
-          if (sid !== this.session.id) {
+          if (sid !== this.session.id || sid === null) {
             this.$router.push("/");
           }
         })
     },
 
     watch: {
-      emails(){
+      emails() {
         this.emailEmpty = this.emails.length === 0;
       }
     },
 
     methods: {
       remove(item) {
-        this.chips.splice(this.chips.indexOf(item), 1);
-        this.chips = [...this.chips]
+        this.emails.splice(this.emails.indexOf(item), 1);
+        this.emails = [...this.emails]
       },
 
-      sendMail(e) {
-        e.preventDefault();
-        const link = 'https://'+this.url;
-        const {id,owner} = this.session;
-        const {username,email} = owner;
-        console.log(this.emails);
+      sendMail() {
+        const link = 'https://' + this.url;
+        const {id, owner,name} = this.session;
+        const {username} = owner;
+        const dbRefs = db.ref("/emailProxy");
         this.emails.forEach(mail => {
-          //  {code,receivers, url, senderEmail, senderName}
-          console.log(mail);
-          sendEmail(id,mail, link, email, username);
-        })
+          dbRefs.push({
+            mail: mail,
+            owner: username,
+            code: id,
+            link: link,
+            name: name,
+          });
+        });
+        this.emails = [];
+        alert("Email sent !");
       },
-
-      next() {
-        this.$router.push("/session/"+this.session.id)
-      }
     },
   }
 </script>
 
 <style scoped>
-
   .qr-img {
     display: block;
     margin-right: auto;
@@ -157,12 +156,12 @@
     margin: 1em 0 1em;
   }
 
-  .my-card{
+  .my-card {
     margin: 2em;
     padding: 2em;
   }
 
-  .bgImg{
+  .bgImg {
     background-image: url("../assets/bg/2.jpg");
     min-height: 100%;
     background-size: cover;
