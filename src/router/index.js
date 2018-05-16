@@ -47,6 +47,11 @@ export default new Router({
       path: '/info',
       name: 'Session Information',
       component: Info,
+    },
+    {
+      path: '/dialog/:id',
+      name: 'Session Information',
+      component: Info,
     }
   ]
 })

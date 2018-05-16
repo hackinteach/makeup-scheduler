@@ -124,16 +124,11 @@
         })
 
       },
-
-      next() {
-        this.$router.push("/session/" + this.session.id)
-      }
     },
   }
 </script>
 
 <style scoped>
-
   .qr-img {
     display: block;
     margin-right: auto;
