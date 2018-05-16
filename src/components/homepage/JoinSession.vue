@@ -36,7 +36,7 @@
         :disabled="!valid"
         @click="join"
       >
-        create
+        join
       </v-btn>
         <p class="caption text-xs-left">Sign in for returning user in the class. If this is the first time, just choose password.</p>
       </v-container>
@@ -45,6 +45,7 @@
 </template>
 
 <script>
+  import {auth,db} from '../../firebase';
   export default{
     data: () => ({
       valid: false,
@@ -72,8 +73,35 @@
 
     methods: {
       join() {
+        const dummyEmail = this.username + "@makeupscheduler.com";
+        const password = this.password;
+        const code = this.code;
 
-      }
+        const dbRefs = db.ref("/session");
+        // console.log('code',code);
+        dbRefs.once('value').then(
+          snapshot => {
+            const sessions = snapshot.val();
+            // console.log("sessions",sessions);
+            Object.values(sessions).map(
+              s => {
+                Object.values(s).map(
+                  session => {
+                    if (session.id === code) {
+                      auth.createUserWithEmailAndPassword(dummyEmail, password)
+                        .then(() => {
+                          this.$router.push("/session/" + code);
+                        })
+                        .catch(err => alert(err));
+                    }
+                  }
+                )
+              }
+            );
+          }
+        )
+
+      },
     }
   }
 </script>

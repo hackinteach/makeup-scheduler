@@ -203,7 +203,7 @@
             .then(() => {
               const user = auth.currentUser.uid;
               const sid = Math.random().toString(36).substring(2, 8) + Math.random().toString(36).substring(2, 5);
-              const dbRefs = db.ref('session/'+subject );
+              const dbRefs = db.ref('session/'+sid );
               dbRefs.push(
                 /* Session object */
                 {
@@ -235,8 +235,7 @@
                   }
                 )
                 .catch(err => alert(err))
-                .catch(err => alert(err));
-            })
+            }).catch(err => alert(err));
         }
 
       }

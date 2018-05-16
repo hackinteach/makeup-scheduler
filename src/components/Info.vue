@@ -83,7 +83,7 @@
     beforeCreate() {
       const sid = this.$route.query.id;
       const sname = this.$route.query.name;
-      const dbRef = db.ref('session/' + sname);
+      const dbRef = db.ref('session/' + sid);
 
       dbRef.once('value').then(snapshot => {
           if (snapshot.val() === null) {
@@ -96,7 +96,7 @@
           // console.log(sid, this.session);
         })
         .then(() => {
-          if (sid !== this.session.id) {
+          if (sid !== this.session.id || sid === null) {
             this.$router.push("/");
           }
         })
@@ -127,7 +127,9 @@
             link: link,
             name: name,
           });
-        })
+        });
+        this.emails = [];
+        alert("Email sent !");
       },
 
       next() {

@@ -19,7 +19,7 @@ const AuthGuard = (to, from, next) => {
 const SessionCheck = (to, from, next) => {
   const sid = this.$route.params.id;
   const sname = this.$route.params.name;
-  const dbRef = db.ref('session/' + sname);
+  const dbRef = db.ref('session/' + sid);
   const dbId = dbRef.once('value').then(session => {
     return session.id
   });
