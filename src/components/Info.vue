@@ -110,8 +110,8 @@
 
     methods: {
       remove(item) {
-        this.chips.splice(this.chips.indexOf(item), 1);
-        this.chips = [...this.chips]
+        this.emails.splice(this.emails.indexOf(item), 1);
+        this.emails = [...this.emails]
       },
 
       sendMail() {
