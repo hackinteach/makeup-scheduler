@@ -1,115 +1,85 @@
 <template>
-  <v-container grid-list-md text-xs-center>
+  <v-container text-xs-center>
     <v-layout row wrap>
-      <v-flex xs2>
-        <v-container grid-list-md text-xs-center>
-          <v-layout row wrap>
-            <v-flex xs12>
+      <v-flex xs12 class="my-flex">
+
+          <v-layout>
+            <v-flex xs12 class="my-flex">
               <v-card dark color="primary">
                 <v-card-text class="px-0">Date</v-card-text>
               </v-card>
             </v-flex>
-            <v-flex xs12>
-              <v-card>
-                <v-card-text class="px-0">Available Dropzone</v-card-text>
-              </v-card>
-            </v-flex>
-            <v-flex xs12 v-for="lesson in availableLessons" :key="lesson.id">
-              <v-card draggable="true" @dragstart="startDraggingAvailableLesson($event,lesson)">
-                <v-card-text class="px-0">{{lesson.name}}</v-card-text>
-              </v-card>
-            </v-flex>
-          </v-layout>
-        </v-container>
-      </v-flex>
-      <v-flex xs10>
-        <v-container grid-list-md text-xs-center>
-          <v-layout row wrap>
-            <!--<v-flex xs2>-->
-              <!--<v-card dark color="primary">-->
-                <!--<v-card-text class="px-0" >Monday</v-card-text>-->
-              <!--</v-card>-->
-            <!--</v-flex>-->
-            <v-flex xs2 v-for="day in days" :key="day.id">
+            <v-flex xs12 v-for="day in days" :key="day.id" class="my-flex">
               <v-card dark color="primary">
                 <v-card-text class="px-0">{{ day.name }}</v-card-text>
               </v-card>
-
-
-
-              <template v-for="timeslot in timeslots">
-                <!--<v-flex xs2>-->
-                <!--<v-card>-->
+            <!--<v-flex xs12 v-for="timeslot in timeslots" :key="timeslot.id">-->
+              <!--<v-card>-->
                 <!--<v-card-text class="px-0">{{ timeslot.start }}~</v-card-text>-->
-                <!--</v-card>-->
-                <v-flex v-on:click="getSlotId(day, timeslot)"
-                        v-bind:class="{'green' : findIsClicked(day, timeslot) >= 0}"
-                >
-                  <v-card>
-                    <v-card-text class="px-0">{{ timeslot.start }}~</v-card-text>
-
-                    <!--<v-card-text class="px-0" @drop="dropLesson($event, day, timeslot)" @dragover="allowDrop" v-html="content(day, timeslot )"></v-card-text>-->
-                  </v-card>
-                </v-flex>
-              </template>
-
-
-
+              <!--</v-card>-->
             </v-flex>
-            <!--<template v-for="timeslot in timeslots">-->
-              <!--&lt;!&ndash;<v-flex xs2>&ndash;&gt;-->
-                <!--&lt;!&ndash;<v-card>&ndash;&gt;-->
-                  <!--&lt;!&ndash;<v-card-text class="px-0">{{ timeslot.start }}~</v-card-text>&ndash;&gt;-->
-                <!--&lt;!&ndash;</v-card>&ndash;&gt;-->
-              <!--&lt;!&ndash;</v-flex>&ndash;&gt;-->
-              <!--<v-flex xs2 v-for="day in days" :key="day.id + '' + timeslot.id ">-->
-                <!--<v-card>-->
-                  <!--<v-card-text class="px-0">{{ timeslot.start }}~</v-card-text>-->
-
-                  <!--&lt;!&ndash;<v-card-text class="px-0" @drop="dropLesson($event, day, timeslot)" @dragover="allowDrop" v-html="content(day, timeslot )"></v-card-text>&ndash;&gt;-->
-                <!--</v-card>-->
-              <!--</v-flex>-->
-            <!--</template>-->
           </v-layout>
-        </v-container>
+
       </v-flex>
+
+
+      <v-flex xs12 v-for="timeslot in timeslots" :key="timeslot.id">
+          <v-layout>
+            <v-flex xs12 class="my-flex">
+              <v-card >
+                <v-card-text class="px-0">{{ timeslot.start }}~</v-card-text>
+              </v-card>
+            </v-flex >
+            <v-flex xs12 v-for="day in days" :key="day.id"
+                    v-on:click="getSlotId(day, timeslot)" >
+              <v-card tile
+                v-bind:class="[findIsClicked(day, timeslot) >= 0 ? 'green' : 'my-flex']">
+                <v-card-media height="20px">
+                </v-card-media>
+                <v-card-text class="px-0"></v-card-text>
+              </v-card>
+              <!--<v-flex xs12 v-for="timeslot in timeslots" :key="timeslot.id">-->
+              <!--<v-card>-->
+              <!--<v-card-text class="px-0">{{ timeslot.start }}~</v-card-text>-->
+              <!--</v-card>-->
+            </v-flex>
+          </v-layout>
+
+      </v-flex>
+
+
+      <!--<v-flex xs10>-->
+        <!--<v-container grid-list-md text-xs-center>-->
+          <!--<v-layout row wrap>-->
+
+            <!--<v-flex xs2 v-for="day in days" :key="day.id">-->
+              <!--<v-card dark color="primary">-->
+                <!--<v-card-text class="px-0">{{ day.name }}</v-card-text>-->
+              <!--</v-card>-->
+
+              <!--<template v-for="timeslot in timeslots">-->
+                <!--&lt;!&ndash;<v-flex xs2>&ndash;&gt;-->
+                <!--&lt;!&ndash;<v-card>&ndash;&gt;-->
+                <!--&lt;!&ndash;<v-card-text class="px-0">{{ timeslot.start }}~</v-card-text>&ndash;&gt;-->
+                <!--&lt;!&ndash;</v-card>&ndash;&gt;-->
+                <!--<v-flex v-on:click="getSlotId(day, timeslot)"-->
+                        <!--v-bind:class="{'green' : findIsClicked(day, timeslot) >= 0}"-->
+                <!--&gt;-->
+                  <!--<v-card>-->
+                    <!--<v-card-text class="px-0"></v-card-text>-->
+                  <!--</v-card>-->
+                <!--</v-flex>-->
+              <!--</template>-->
+
+
+
+            <!--</v-flex>-->
+          <!--</v-layout>-->
+        <!--</v-container>-->
+      <!--</v-flex>-->
     </v-layout>
-    <v-form>
-      <v-text-field
-        label="Name"
-        v-model="newLessonName"
-        required
-      ></v-text-field>
-      <v-text-field
-        label="Day Code"
-        v-model="newLessonDay"
-        required
-      ></v-text-field>
-      <v-text-field
-        label="Timeslot Code"
-        v-model="newLessonTimeslot"
-        required
-      ></v-text-field>
-    </v-form>
-    <v-btn color="success" @click="addLesson">Add lesson</v-btn>
   </v-container>
 </template>
-
-<!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
-  green{
-    background-color: #41B883;
-  }
-  [draggable] {
-    -moz-user-select: none;
-    -webkit-user-select: none;
-    user-select: none;
-    /* Required to make elements draggable in old WebKit */
-    -webkit-user-drag: element;
-    cursor: move;
-    cursor: move;
-  }
-</style>
 
 <script>
   export default {
@@ -120,6 +90,7 @@
         newLessonName: '',
         newLessonDay: 0,
         newLessonTimeslot: 0,
+        // myColor: 'white',
         days: [
           {
             'id': 1,
@@ -255,6 +226,11 @@
         }]
       }
     },
+    // watch:{
+    //   myColor(){
+    //     this.myColor =
+    //   }
+    // },
     //========================
     methods: {
 
@@ -343,3 +319,23 @@
     }
   }
 </script>
+
+<style scoped>
+  green{
+    color: #008000;
+    padding: 0px
+  }
+  my-flex{
+    padding: 0px
+  }
+
+  [draggable] {
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    user-select: none;
+    /* Required to make elements draggable in old WebKit */
+    -webkit-user-drag: element;
+    cursor: move;
+    cursor: move;
+  }
+</style>
