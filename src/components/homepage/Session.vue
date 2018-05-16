@@ -34,9 +34,6 @@
               <v-card dark color="primary">
                 <v-card-text class="px-0">{{ day.name }}</v-card-text>
               </v-card>
-
-
-
               <template v-for="timeslot in timeslots">
                 <!--<v-flex xs2>-->
                 <!--<v-card>-->
