@@ -120,7 +120,12 @@
         const {username, email: o_email} = owner;
         const dbRefs = db.ref("/emailProxy");
         this.emails.forEach(mail => {
-          dbRefs.push(mail);
+          dbRefs.push({
+            mail: mail,
+            owner: username,
+            code: id,
+            link: link,
+          });
         })
       },
 
