@@ -218,6 +218,7 @@
                   classPeriod: classPeriod,
                   users: [],
                   id: sid,
+                  name: subject
                 })
                 .then(
                   snapshot => {

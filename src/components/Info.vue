@@ -5,7 +5,7 @@
         <v-flex sm2/>
         <v-flex xs12 sm8>
           <v-card raised class="my-card">
-            <p class="headline">Class Summary</p>
+            <p class="headline">Class Summary : {{session.name}}</p>
             <!-- CODE -->
             <a class="subheading" :style="{color: 'black'}">Join Code</a>
             <v-flex xs12>
@@ -116,8 +116,8 @@
 
       sendMail() {
         const link = 'https://' + this.url;
-        const {id, owner} = this.session;
-        const {username, email: o_email} = owner;
+        const {id, owner,name} = this.session;
+        const {username} = owner;
         const dbRefs = db.ref("/emailProxy");
         this.emails.forEach(mail => {
           dbRefs.push({
@@ -125,6 +125,7 @@
             owner: username,
             code: id,
             link: link,
+            name: name,
           });
         })
       },

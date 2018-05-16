@@ -115,7 +115,7 @@ exports.fireEmail = functions.database.ref("/emailProxy").onUpdate(
 );
 
 const fireTheEmail = (session) => {
-  const {owner, link, code,mail} = session;
+  const {owner, name,link, code,mail} = session;
   console.log("data",owner,link,code,mail);
   const mailOptions = {
     from: `${APP_NAME} <noreply@firebase.com>`,
@@ -124,7 +124,7 @@ const fireTheEmail = (session) => {
 
   // The user subscribed to the newsletter.
   mailOptions.subject = `${owner} invite to join makeup session`;
-  mailOptions.html = `Please use code below to join the makeup session <br/>
+  mailOptions.html = `Please use code below to join the makeup session for <b>${name}</b><br/>
                        <h1 style="text-align:center">${code}</h1>
                        <br/>
                        or click this link: <h3 style="text-align:center"><a href="${link}">${link}</a></h3>`;
