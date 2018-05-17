@@ -111,21 +111,35 @@
    */
   export default {
     created(){
-      if (this.days.length == 0){
-        this.generateDate();
-      }
+      this.generateDate();
+      /* Initialize personal table*/
       const code = this.$route.params.id
-      const dbRefs = db.ref("/session/"+code+"/users");
+      console.log(auth.currentUser);
+      const uid = auth.currentUser.uid;
+      console.log('uid',uid);
+      const dbRefs = db.ref("/session/"+code+"/users/");
+      dbRefs.once("value").then((snapshot) => {
+          // console.log(snapshot.val());
+          const uu = snapshot.val();
+          console.log('uu',uu);
+          this.clicked = uu;
+        }
+      )
+
+        /* Listener fo realtime session table */
       dbRefs.on("child_changed", (snapshot)=> {
         const users = snapshot.val();
-        let u;
-        for (u in users){
-          const userTime = users[u];
-          userTime.forEach(t => {
-            this.clicked.push(t)
-          })
+        if(this.type==='session'){
+          let u;
+          let tt = [];
+          for (u in users){
+            const userTime = users[u];
+            Object.values(userTime).map(t => {
+              tt.push(t)
+            })
+          }
+          this.clicked = _.uniqWith(tt, _.isEqual)
         }
-        this.clicked = _.uniqWith(this.clicked, _.isEqual)
       })
     },
     data () {
@@ -216,7 +230,7 @@
             console.log(snapshot.val()[uid]);
             const uu = snapshot.val()[uid];
             this.clicked = uu;
-            console.log(this.clicked)
+            console.log("personal clicked at watch", this.clicked)
           }, function (errorObject) {
             alert("The read failed: " + errorObject.code);
           });
@@ -224,13 +238,14 @@
           dbRefs.once("value").then(snapshot =>{
             const users = snapshot.val();
             let u;
+            let tt = [];
             for (u in users){
               const userTime = users[u];
-              userTime.forEach(t => {
-                this.clicked.push(t)
+              Object.values(userTime).map(t => {
+                tt.push(t)
               })
             }
-            this.clicked = _.uniqWith(this.clicked, _.isEqual)
+            this.clicked = _.uniqWith(tt, _.isEqual)
           })
         }
       }
@@ -239,9 +254,9 @@
 
     save (){
         const code  = this.$route.params.id;
-        const dbRefs = db.ref("/session/"+code);
-        const uid = "wit";
-        dbRefs.update({users: {[uid]: this.clicked}})
+      const uid = auth.currentUser.uid;
+      const dbRefs = db.ref(`session/${code}/users/`);
+        dbRefs.update({[uid]: this.clicked});
         // dbRefs.once('value').then(
         //   snapshot => {
         //     const sId = snapshot.val();
@@ -298,28 +313,30 @@
             const sId = snapshot.val();
             console.log('sId',sId)
             Object.keys(sId).map(id => {
-              console.log('id',id);
-              const session = sId[id];
-              console.log(session.startDate);
-              startDate=session.startDate;
-              var dateSplit = startDate.split("/")
-              var month = parseInt(dateSplit[1])
-              var year = parseInt(dateSplit[2])
-              var day = parseInt(dateSplit[0])
-              var nextDay;
-              var lst = [{
-                'id': 1, 'date' : day+"/"+month+"/"+year
-              }]
-              var i;
-              for (i=1;i<7;i++){
-                nextDay = this.getNextDate(year, month, day)
-                year = nextDay[0]
-                month = nextDay[1]
-                day = nextDay[2]
-                lst.push({'id' : i+1,  'date' : day+"/"+month+"/"+year})
+              if(id !== "users"){
+                console.log('id',id);
+                const session = sId[id];
+                console.log(session.startDate);
+                startDate=session.startDate;
+                var dateSplit = startDate.split("/")
+                var month = parseInt(dateSplit[1])
+                var year = parseInt(dateSplit[2])
+                var day = parseInt(dateSplit[0])
+                var nextDay;
+                var lst = [{
+                  'id': 1, 'date' : day+"/"+month+"/"+year
+                }]
+                var i;
+                for (i=1;i<7;i++){
+                  nextDay = this.getNextDate(year, month, day)
+                  year = nextDay[0]
+                  month = nextDay[1]
+                  day = nextDay[2]
+                  lst.push({'id' : i+1,  'date' : day+"/"+month+"/"+year})
+                }
+                console.log(lst);
+                this.days = lst;
               }
-              console.log(lst);
-              this.days = lst;
             })
           }
         )
