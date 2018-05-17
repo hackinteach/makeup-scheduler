@@ -114,6 +114,7 @@
       if (this.days.length == 0){
         this.generateDate();
       }
+      const code = this.$route.params.id
       const dbRefs = db.ref("/session/"+code+"/users");
       dbRefs.on("child_changed", (snapshot)=> {
         const users = snapshot.val();
