@@ -38,12 +38,12 @@
         <v-flex xs12 v-for="timeslot in timeslots" :key="timeslot.id">
           <v-layout>
             <v-flex xs12 class="my-flex">
-              <v-card >
+              <v-card>
                 <v-card-text class="px-0">{{ timeslot.start }}~</v-card-text>
               </v-card>
-            </v-flex >
+            </v-flex>
             <v-flex xs12 v-for="day in days" :key="day.id"
-                    v-on:click="type === 'personal' ? getSlotId(day, timeslot) : ()=>{}" >
+                    v-on:click="type === 'personal' ? getSlotId(day, timeslot) : ()=>{}">
               <v-card tile
                       v-bind:class="[findIsClicked(day, timeslot) >= 0 ? 'green' : 'my-flex']">
                 <v-card-media height="20px">
@@ -84,7 +84,6 @@
         <!--</template>-->
 
 
-
         <!--</v-flex>-->
         <!--</v-layout>-->
         <!--</v-container>-->
@@ -96,7 +95,7 @@
 </template>
 
 <script>
-  import { auth, db } from '../../firebase';
+  import {auth, db} from '../../firebase';
   import * as _ from 'lodash';
   import InfoDialog from '../session/InfoDialog';
 
@@ -110,47 +109,48 @@
    *          -{dayId:, timeId}
    */
   export default {
-    created(){
+    created() {
       this.generateDate();
       /* Initialize personal table*/
       const code = this.$route.params.id
       console.log(auth.currentUser);
       const uid = auth.currentUser.uid;
-      console.log('uid',uid);
-      const dbRefs = db.ref("/session/"+code+"/users/");
+      console.log('uid', uid);
+      const dbRefs = db.ref("/session/" + code + "/users/");
       dbRefs.once("value").then((snapshot) => {
           // console.log(snapshot.val());
           const uu = snapshot.val();
-          console.log('uu',uu[uid]);
+          console.log('uu', uu[uid]);
           const use = uu[uid];
-          if(use === null){
+          if (use === null) {
 
-          }else{
+          } else {
             this.clicked = uu[uid];
           }
         }
       )
 
-        /* Listener fo realtime session table */
-      // dbRefs.on("child_changed", (snapshot)=> {
-      //   const users = snapshot.val();
-      //   if(this.type==='session'){
-      //     let u;
-      //     let tt = [];
-      //     for (u in users){
-      //       const userTime = users[u];
-      //       Object.values(userTime).map(t => {
-      //         tt.push(t)
-      //       })
-      //     }
-      //     this.clicked = _.uniqWith(tt, _.isEqual)
-      //   }
-      // })
+      /* Listener fo realtime session table */
+      dbRefs.on("child_changed", (snapshot) => {
+        console.log("changed");
+        const users = snapshot.val();
+        if (this.type === 'session') {
+          let u;
+          let tt = [];
+          for (u in users) {
+            const userTime = users[u];
+            Object.values(userTime).map(t => {
+              tt.push(t)
+            })
+          }
+          this.clicked = _.uniqWith(tt, _.isEqual)
+        }
+      })
     },
-    data () {
+    data() {
       return {
-        types:[
-          "personal","session"
+        types: [
+          "personal", "session"
         ],
         type: "personal",
         timetable: [],
@@ -224,11 +224,11 @@
         clicked: [],
       }
     },
-    watch:{
-      type(){
-        const code  = this.$route.params.id;
-        const dbRefs = db.ref("/session/"+code+"/users");
-        if(this.type === "personal"){
+    watch: {
+      type() {
+        const code = this.$route.params.id;
+        const dbRefs = db.ref("/session/" + code + "/users");
+        if (this.type === "personal") {
           let uid = auth.currentUser.uid;
           console.log(dbRefs)
           dbRefs.once("value").then((snapshot) => {
@@ -239,12 +239,12 @@
           }, function (errorObject) {
             alert("The read failed: " + errorObject.code);
           });
-        }else if(this.type === "session"){
-          dbRefs.once("value").then(snapshot =>{
+        } else if (this.type === "session") {
+          dbRefs.once("value").then(snapshot => {
             const users = snapshot.val();
             let u;
             let tt = [];
-            for (u in users){
+            for (u in users) {
               const userTime = users[u];
               Object.values(userTime).map(t => {
                 tt.push(t)
@@ -257,10 +257,10 @@
     },
     methods: {
 
-    save (){
-        const code  = this.$route.params.id;
-      const uid = auth.currentUser.uid;
-      const dbRefs = db.ref(`session/${code}/users/`);
+      save() {
+        const code = this.$route.params.id;
+        const uid = auth.currentUser.uid;
+        const dbRefs = db.ref(`session/${code}/users/`);
         dbRefs.update({[uid]: this.clicked});
         // dbRefs.once('value').then(
         //   snapshot => {
@@ -291,55 +291,55 @@
         // })
       },
 
-      getNextDate(year, month, day){
-        if (month==12 && day==31){
-          return [year+1, 1, 1]
+      getNextDate(year, month, day) {
+        if (month === 12 && day === 31) {
+          return [year + 1, 1, 1]
         }
-        else if (day==28 && month==2) {
+        else if (day === 28 && month === 2) {
           return [year, 3, 1]
         }
-        else if (day==30 && (month==4 || month==6 || month==9 || month==11 )){
-          return [year, month+1, 1]
+        else if (day === 30 && (month === 4 || month === 6 || month === 9 || month === 11)) {
+          return [year, month + 1, 1]
         }
-        else if (day==31){
-          return [year, month+1, 1]
+        else if (day === 31) {
+          return [year, month + 1, 1]
         }
-        else{
-          return [year, month, day+1]
+        else {
+          return [year, month, day + 1]
         }
       },
 
-      async generateDate(){
-        const code  = this.$route.params.id;
-        const dbRefs = db.ref("/session/"+code);
-        var startDate;
+      async generateDate() {
+        const code = this.$route.params.id;
+        const dbRefs = db.ref("/session/" + code);
+        let startDate;
         dbRefs.once('value').then(
           snapshot => {
             const sId = snapshot.val();
-            console.log('sId',sId)
+            // console.log('sId',sId)
             Object.keys(sId).map(id => {
-              if(id !== "users"){
-                console.log('id',id);
+              if (id !== "users") {
+                // console.log('id',id);
                 const session = sId[id];
-                console.log(session.startDate);
-                startDate=session.startDate;
-                var dateSplit = startDate.split("/")
-                var month = parseInt(dateSplit[1])
-                var year = parseInt(dateSplit[2])
-                var day = parseInt(dateSplit[0])
-                var nextDay;
-                var lst = [{
-                  'id': 1, 'date' : day+"/"+month+"/"+year
+                // console.log(session.startDate);
+                startDate = session.startDate;
+                let dateSplit = startDate.split("/")
+                let month = parseInt(dateSplit[1])
+                let year = parseInt(dateSplit[2])
+                let day = parseInt(dateSplit[0])
+                let nextDay;
+                let lst = [{
+                  'id': 1, 'date': day + "/" + month + "/" + year
                 }]
-                var i;
-                for (i=1;i<7;i++){
+                let i;
+                for (i = 1; i < 7; i++) {
                   nextDay = this.getNextDate(year, month, day)
                   year = nextDay[0]
                   month = nextDay[1]
                   day = nextDay[2]
-                  lst.push({'id' : i+1,  'date' : day+"/"+month+"/"+year})
+                  lst.push({'id': i + 1, 'date': day + "/" + month + "/" + year})
                 }
-                console.log(lst);
+                // console.log(lst);
                 this.days = lst;
               }
             })
@@ -347,17 +347,17 @@
         )
       },
 
-      findIsClicked(day, timeslot){
-        var i;
-        if (this.clicked == null){
+      findIsClicked(day, timeslot) {
+        let i;
+        if (this.clicked === null) {
           return -1;
         }
-        if (this.clicked.length == 0){
+        if (this.clicked.length === 0) {
           return -1;
         }
-        for (i=0; i < this.clicked.length; i++){
+        for (i = 0; i < this.clicked.length; i++) {
           // console.log(slot)
-          if (this.clicked[i]['dayId'] == day.id && this.clicked[i]['timeId'] == timeslot.id){
+          if (this.clicked[i]['dayId'] === day.id && this.clicked[i]['timeId'] === timeslot.id) {
             // console.log("true")
             // console.log(this.clicked[i]['dayId'])
             return i;
@@ -366,15 +366,15 @@
         return -1;
       },
 
-      getSlotId (day, timeslot){
-        console.log(this.clicked)
-        console.log(day.id+"-> "+timeslot.id)
+      getSlotId(day, timeslot) {
+        // console.log(this.clicked)
+        // console.log(day.id+"-> "+timeslot.id)
         const idx = this.findIsClicked(day, timeslot)
-        console.log("onclicked", this.clicked)
-        if (idx >= 0){
+        // console.log("onclicked", this.clicked)
+        if (idx >= 0) {
           this.clicked.splice(idx, 1)
         }
-        else{
+        else {
           this.clicked.push({'dayId': day.id, 'timeId': timeslot.id})
         }
       }
@@ -382,7 +382,7 @@
       // async getWeek(){
       //   const code  = this.$route.params.id;
       //   const dbRefs = db.ref("/session/"+code);
-      //   var startDate;
+      //   let startDate;
       //   dbRefs.once('value').then(
       //     snapshot => {
       //       const sId = snapshot.val();
@@ -402,11 +402,12 @@
 </script>
 
 <style scoped>
-  green{
+  green {
     color: #008000;
     padding: 0px
   }
-  my-flex{
+
+  my-flex {
     padding: 0px
   }
 
