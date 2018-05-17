@@ -1,6 +1,17 @@
 <template>
   <div>
     <v-container text-xs-center>
+      <v-flex xs6>
+        <v-subheader>Choose Session Type</v-subheader>
+      </v-flex>
+      <v-flex xs6>
+        <v-select
+          :items="types"
+          v-model="type"
+          label="Select"
+          single-line
+        ></v-select>
+      </v-flex>
       <v-layout row wrap>
         <v-flex xs12 class="my-flex">
 
@@ -87,45 +98,47 @@
 <script>
   import { auth, db } from '../../firebase';
   import * as _ from 'lodash';
+  import InfoDialog from '../session/InfoDialog';
 
+  /**
+   * expectation of db
+   * -sessionCode
+   *  -key
+   *    -users
+   *      -uid
+   *        -index of time user is not free
+   *          -{dayId:, timeId}
+   */
   export default {
     created(){
+      if (this.days.length == 0){
         this.generateDate();
+      }
+      const dbRefs = db.ref("/session/"+code+"/users");
+      dbRefs.on("child_changed", (snapshot)=> {
+        const users = snapshot.val();
+        let u;
+        for (u in users){
+          const userTime = users[u];
+          userTime.forEach(t => {
+            this.clicked.push(t)
+          })
+        }
+        this.clicked = _.uniqWith(this.clicked, _.isEqual)
+      })
     },
     data () {
       return {
+        types:[
+          "personal","session"
+        ],
+        type: "personal",
         timetable: [],
         sessionCode: this.$route.params.id,
         newLessonName: '',
         newLessonDay: 0,
         newLessonTimeslot: 0,
         days: [],
-        //   [
-        //   {
-        //     'id': 1,
-        //     'name': 'Monday'
-        //   },
-        //   {
-        //     'id': 2,
-        //     'name': 'Tuesday'
-        //   },
-        //   {
-        //     'id': 3,
-        //     'name': 'Wednesday'
-        //   },
-        //   {
-        //     'id': 4,
-        //     'name': 'Thursday'
-        //   },
-        //   {
-        //     'id': 5,
-        //     'name': 'Friday'
-        //   },
-        //   {
-        //     'id': 6,
-        //     'name': 'Saturday'
-        //   }
-        // ],
         timeslots: [
           {
             'id': 1,
@@ -188,56 +201,73 @@
             'end': '20:00'
           }
         ],
-        clicked: []
+        clicked: [],
       }
     },
-    // watch:{
-    //   myColor(){
-    //     this.myColor =
-    //   }
-    // },
-    //========================
-    methods: {
-      addToList(lst, obj){
-        var slot;
-        for (slot in lst){
-          if (slot.dayId == obj.dayId && slot.timeId == obj.timeId){
-            return true
-          }
+    watch:{
+      type(){
+        const code  = this.$route.params.id;
+        const dbRefs = db.ref("/session/"+code+"/users");
+        if(this.type === "personal"){
+          let uid = auth.currentUser.uid;
+          console.log(dbRefs)
+          dbRefs.once("value").then((snapshot) => {
+            console.log(snapshot.val()[uid]);
+            const uu = snapshot.val()[uid];
+            this.clicked = uu;
+            console.log(this.clicked)
+          }, function (errorObject) {
+            alert("The read failed: " + errorObject.code);
+          });
+        }else if(this.type === "session"){
+          dbRefs.once("value").then(snapshot =>{
+            const users = snapshot.val();
+            let u;
+            for (u in users){
+              const userTime = users[u];
+              userTime.forEach(t => {
+                this.clicked.push(t)
+              })
+            }
+            this.clicked = _.uniqWith(this.clicked, _.isEqual)
+          })
         }
-        return false
-      },
+      }
+    },
+    methods: {
 
     save (){
         const code  = this.$route.params.id;
         const dbRefs = db.ref("/session/"+code);
-        dbRefs.once('value').then(
-          snapshot => {
-            const sId = snapshot.val();
-            console.log('sId',sId)
-            Object.keys(sId).map(id => {
-              console.log('id',id);
-              const session = sId[id];
-              const time = session.studentTimeSlot;
-              console.log("before anything",time);
-              if (!session.studentTimeSlot){
-                console.log("not made yet");
-                db.ref("/session/"+code+"/"+id).update({studentTimeSlot: this.clicked})
-              }
-              else{
-                console.log("already have one")
-                this.clicked.forEach(x => {
-                  time.push({
-                    dayId: x.dayId,
-                    timeId: x.timeId
-                  })
-                });
-                let t = _.uniqWith(time, _.isEqual)
-                console.log(t);
-                db.ref("/session/"+code+"/"+id).update({studentTimeSlot: t})
-              }
-            })
-        })
+        const uid = "wit";
+        dbRefs.update({users: {[uid]: this.clicked}})
+        // dbRefs.once('value').then(
+        //   snapshot => {
+        //     const sId = snapshot.val();
+        //     console.log('sId',sId)
+        //     Object.keys(sId).map(id => {
+        //       console.log('id',id);
+        //       const session = sId[id];
+        //       const time = session.studentTimeSlot;
+        //       console.log("before anything",time);
+        //       if (!session.studentTimeSlot){
+        //         console.log("not made yet");
+        //         dbRefs.update({users: {[uid]: this.clicked}})
+        //       }
+        //       else{
+        //         console.log("already have one")
+        //         this.clicked.forEach(x => {
+        //           time.push({
+        //             dayId: x.dayId,
+        //             timeId: x.timeId
+        //           })
+        //         });
+        //         let t = _.uniqWith(time, _.isEqual)
+        //         console.log(t);
+        //         dbRefs.update({users: {[uid]: t}})
+        //       }
+        //     })
+        // })
       },
 
       getNextDate(year, month, day){
