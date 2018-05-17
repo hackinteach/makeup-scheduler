@@ -86,6 +86,10 @@
 
     beforeCreate() {
       const sid = this.$route.params.id;
+      if (!sid){
+        this.$router.push('/');
+        return;
+      }
       const dbRef = db.ref('session/' + id);
 
       dbRef.once('value').then(snapshot => {
