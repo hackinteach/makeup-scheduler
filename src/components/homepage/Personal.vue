@@ -86,7 +86,7 @@
 
 <script>
   import { auth, db } from '../../firebase';
-  import Router from '../../router/index';
+  import * as _ from 'lodash';
 
   export default {
     created(){
@@ -188,9 +188,7 @@
             'end': '20:00'
           }
         ],
-        clicked: [{
-          'dayId' : 0, 'timeId': 0
-        }]
+        clicked: []
       }
     },
     // watch:{
@@ -200,11 +198,19 @@
     // },
     //========================
     methods: {
+      addToList(lst, obj){
+        var slot;
+        for (slot in lst){
+          if (slot.dayId == obj.dayId && slot.timeId == obj.timeId){
+            return true
+          }
+        }
+        return false
+      },
 
-      save (){
+    save (){
         const code  = this.$route.params.id;
         const dbRefs = db.ref("/session/"+code);
-        var startDate;
         dbRefs.once('value').then(
           snapshot => {
             const sId = snapshot.val();
@@ -212,15 +218,24 @@
             Object.keys(sId).map(id => {
               console.log('id',id);
               const session = sId[id];
-              if (!session.studentTimeslot){
+              const time = session.studentTimeSlot;
+              console.log("before anything",time);
+              if (!session.studentTimeSlot){
                 console.log("not made yet");
-                db.ref("/session/"+code+"/"+id).push({Name: "studentTimeslot", Value: this.clicked})
+                db.ref("/session/"+code+"/"+id).update({studentTimeSlot: this.clicked})
               }
               else{
-                console.log("we have one");
+                console.log("already have one")
+                this.clicked.forEach(x => {
+                  time.push({
+                    dayId: x.dayId,
+                    timeId: x.timeId
+                  })
+                });
+                let t = _.uniqWith(time, _.isEqual)
+                console.log(t);
+                db.ref("/session/"+code+"/"+id).update({studentTimeSlot: t})
               }
-
-              startDate=session.startDate;
             })
         })
       },
@@ -281,6 +296,9 @@
 
       findIsClicked(day, timeslot){
         var i;
+        if (this.clicked.length == 0){
+          return -1;
+        }
         for (i=0; i < this.clicked.length; i++){
           // console.log(slot)
           if (this.clicked[i]['dayId'] == day.id && this.clicked[i]['timeId'] == timeslot.id){
