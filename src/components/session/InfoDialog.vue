@@ -3,61 +3,64 @@
     <v-layout row justify-center>
       <v-btn color="primary" dark @click.stop="dialog2 = true">Session Information</v-btn>
       <v-dialog v-model="dialog2" max-width="500px">
-        <v-card raised class="my-card">
-          <p class="headline">Class Summary</p>
-          <!-- CODE -->
-          <a class="subheading" :style="{color: 'black'}">Join Code</a>
-          <v-flex xs12>
-            <v-card :flat="true" color="grey lighten-2">
-              <a class="display-3">
-                {{session.id}}
-              </a>
-            </v-card>
-          </v-flex>
-          <v-divider class="divider"/>
-          <!-- URL -->
-          <v-icon>insert_link</v-icon>
-          <a class="subheading" :style="{color: 'black'}"> Share this link to your members</a>
-          <v-flex>
-            <a class="body-1" :href="'https://'+url">https://{{url}}</a>
-          </v-flex>
-          <v-divider class="divider"/>
+        <v-container row wrap grid-list-xs text-xs-center>
+          <v-layout row wrap>
+            <v-flex xs12>
+              <v-card raised class="my-card">
+                <p class="headline">Class Summary : {{session.name}}</p>
+                <!-- CODE -->
+                <a class="subheading" :style="{color: 'black'}">Join Code</a>
+                <v-flex xs12>
+                  <v-card :flat="true" color="grey lighten-2">
+                    <a class="display-3">
+                      {{session.id}}
+                    </a>
+                  </v-card>
+                </v-flex>
+                <v-divider class="divider"/>
+                <!-- URL -->
+                <v-icon>insert_link</v-icon>
+                <a class="subheading" :style="{color: 'black'}"> Share this link to your members</a>
+                <v-flex>
+                  <a class="body-1" :href="'https://'+url">https://{{url}}</a>
+                </v-flex>
+                <v-divider class="divider"/>
 
-          <!-- QR CODE -->
-          <q-r-code class="qr-img" :style="{marginLeft: 'auto', margiRight: 'auto'}" :size="100" :text="url"/>
-          <!-- EMAIL -->
+                <!-- QR CODE -->
+                <q-r-code class="qr-img" :style="{marginLeft: 'auto', margiRight: 'auto'}" :size="100" :text="url"/>
+                <!-- EMAIL -->
 
-          <v-divider class="divider"/>
-          <p class="title">Send link via email</p>
-          <v-select
-            v-model="emails"
-            label="Email list"
-            chips
-            tags
-            solo
-            prepend-icon="email"
-            append-icon=""
-            clearable
-            class="email-select"
-          >
-            <template slot="selection" slot-scope="data">
-              <v-chip
-                :selected="data.selected"
-                close
-                @input="remove(data.item)"
-              >
-                <strong>{{ data.item }}</strong>&nbsp;
-              </v-chip>
-            </template>
-          </v-select>
-          <v-btn :disabled="emailEmpty" @click="sendMail">
-            <v-icon color="grey darken-2">send</v-icon>
-          </v-btn>
-          <v-divider class="divider"/>
-          <v-card-actions>
-            <v-btn color="primary" flat @click.stop="dialog2=false">Close</v-btn>
-          </v-card-actions>
-        </v-card>
+                <v-divider class="divider"/>
+                <p class="title">Send link via email</p>
+                <v-select
+                  v-model="emails"
+                  label="Email list"
+                  chips
+                  tags
+                  solo
+                  prepend-icon="email"
+                  append-icon=""
+                  clearable
+                  class="email-select"
+                >
+                  <template slot="selection" slot-scope="data">
+                    <v-chip
+                      :selected="data.selected"
+                      close
+                      @input="remove(data.item)"
+                    >
+                      <strong>{{ data.item }}</strong>&nbsp;
+                    </v-chip>
+                  </template>
+                </v-select>
+                <v-btn :disabled="emailEmpty" @click="sendMail">
+                  <v-icon color="grey darken-2">send</v-icon>
+                </v-btn>
+                <v-divider class="divider"/>
+              </v-card>
+            </v-flex>
+          </v-layout>
+        </v-container>
       </v-dialog>
     </v-layout>
   </div>
@@ -148,7 +151,7 @@
     display: block;
     margin-right: auto;
     margin-left: auto;
-    width: 50%;
+    width: 80%;
   }
 
   .email-select {
