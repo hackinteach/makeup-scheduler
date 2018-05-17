@@ -16,7 +16,7 @@
 <script>
   import AddSession from './AddSession';
   import JoinSession from "./JoinSession";
-  import Session from "./Session";
+  import Session from "./Personal";
   export default {
     components: {
       JoinSession,
