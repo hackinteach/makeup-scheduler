@@ -74,7 +74,7 @@
   export default {
     components: {QRCode},
     data: () => ({
-      session: null,
+      session: {id: ""},
       url: '',
       emails: [],
       emailEmpty: true,

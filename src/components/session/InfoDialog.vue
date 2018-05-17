@@ -54,6 +54,9 @@
             <v-icon color="grey darken-2">send</v-icon>
           </v-btn>
           <v-divider class="divider"/>
+          <v-card-actions>
+            <v-btn color="primary" flat @click.stop="dialog2=false">Close</v-btn>
+          </v-card-actions>
         </v-card>
       </v-dialog>
     </v-layout>
@@ -67,13 +70,15 @@
   export default {
     components: {QRCode},
     data: () => ({
-      session: null,
+      session: {id: ""},
       url: '',
       emails: [],
       emailEmpty: true,
+      dialog2: false,
+
     }),
 
-    beforeCreate() {
+    created() {
       console.log(this.$route.params);
       const sid = this.$route.params.id;
       console.log(sid);
@@ -133,6 +138,7 @@
         this.emails = [];
         alert("Email sent !");
       },
+
     },
   }
 </script>
