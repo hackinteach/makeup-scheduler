@@ -86,23 +86,30 @@
             // console.log("sessions",sessions);
             Object.values(sessions).map(
               s => {
+                const key = Object.keys(s)[0];
                 Object.values(s).map(
                   session => {
                     const existingUser = session.existUser;
+                    // console.log(existingUser);
                     let userExists = false;
-                    Object.key(existingUser).map(i => {
-                      const u = existingUser[i]
-                      if(username === u)
-                        userExists = true;
-                    });
+                    if(existingUser != null){
+                      Object.values(existingUser).map(u => {
+                        if(username === u)
+                          userExists = true;
+                      });
+                    }
                     if (session.id === code && userExists) {
+                      // console.log("Logged in");
                       auth.signInWithEmailAndPassword(dummyEmail, password)
                         .then(()=>{
                           this.$router.push("/session/"+code);
                         })
                     }else if(session.id === code && !userExists){
+                      // console.log("User created");
                       auth.createUserWithEmailAndPassword(dummyEmail, password)
                         .then(() => {
+                          const userRefs = db.ref(`/session/${code}/${key}/existUser`);
+                          userRefs.push(username);
                           this.$router.push("/session/" + code);
                         })
                         .catch(err => alert(err));
