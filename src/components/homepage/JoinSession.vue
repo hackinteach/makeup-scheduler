@@ -74,6 +74,7 @@
     methods: {
       join() {
         const dummyEmail = this.username + "@makeupscheduler.com";
+        const username = this.username;
         const password = this.password;
         const code = this.code;
 
@@ -87,7 +88,19 @@
               s => {
                 Object.values(s).map(
                   session => {
-                    if (session.id === code) {
+                    const existingUser = session.existUser;
+                    let userExists = false;
+                    Object.key(existingUser).map(i => {
+                      const u = existingUser[i]
+                      if(username === u)
+                        userExists = true;
+                    });
+                    if (session.id === code && userExists) {
+                      auth.signInWithEmailAndPassword(dummyEmail, password)
+                        .then(()=>{
+                          this.$router.push("/session/"+code);
+                        })
+                    }else if(session.id === code && !userExists){
                       auth.createUserWithEmailAndPassword(dummyEmail, password)
                         .then(() => {
                           this.$router.push("/session/" + code);
@@ -100,8 +113,22 @@
             );
           }
         )
-
       },
+
+      checkUserExists(username,sid){
+        const dbRefs = db.ref(`session/${sid}/${username}`);
+        let valid = false;
+        dbRefs.once('value').then(snapshot=>{
+          const users = snapshot.val();
+          Object.keys(users).map(i=>{
+            const user = users[i];
+            if(username === user){
+              valid = true;
+            }
+          })
+        })
+          .then(() => valid)
+      }
     }
   }
 </script>
