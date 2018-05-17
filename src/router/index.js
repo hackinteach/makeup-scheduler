@@ -4,6 +4,7 @@ import Home from '../components/homepage/Home'
 import Personal from '../components/homepage/Personal'
 import Info from '../components/Info';
 import {auth, db} from '../firebase'
+import InfoDialog from '../components/session/InfoDialog';
 
 Vue.use(Router);
 
@@ -50,8 +51,8 @@ export default new Router({
     },
     {
       path: '/dialog/:id',
-      name: 'Session Information',
-      component: Info,
+      name: 'Session Information 2',
+      component: InfoDialog,
     }
   ]
 })
