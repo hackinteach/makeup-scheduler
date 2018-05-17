@@ -131,6 +131,10 @@
         this.emails = [];
         alert("Email sent !");
       },
+
+      next(){
+        this.$router.push("/session/"+this.$route.queries.id);
+      }
     },
   }
 </script>

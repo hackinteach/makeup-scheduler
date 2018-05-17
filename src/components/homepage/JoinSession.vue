@@ -102,7 +102,10 @@
                       // console.log("Logged in");
                       auth.signInWithEmailAndPassword(dummyEmail, password)
                         .then(()=>{
-                          this.$router.push("/session/"+code);
+                          auth.setPersistence(firebase.auth.Auth.Persistence.SESSION)
+                            .then(
+                              ()=>this.$router.push("/session/"+code)
+                            )
                         })
                     }else if(session.id === code && !userExists){
                       // console.log("User created");
