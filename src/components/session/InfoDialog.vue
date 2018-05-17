@@ -2,14 +2,6 @@
   <div>
     <v-layout row justify-center>
       <v-btn color="primary" dark @click.stop="dialog2 = true">Session Information</v-btn>
-      <v-menu bottom offset-y>
-        <v-btn slot="activator">A Menu</v-btn>
-        <v-list>
-          <v-list-tile v-for="(item, i) in items" :key="i" @click="">
-            <v-list-tile-title>{{ item.title }}</v-list-tile-title>
-          </v-list-tile>
-        </v-list>
-      </v-menu>
       <v-dialog v-model="dialog2" max-width="500px">
         <v-card raised class="my-card">
           <p class="headline">Class Summary</p>
@@ -62,10 +54,6 @@
             <v-icon color="grey darken-2">send</v-icon>
           </v-btn>
           <v-divider class="divider"/>
-          <v-btn
-            @click="next">
-            next
-          </v-btn>
         </v-card>
       </v-dialog>
     </v-layout>
@@ -73,8 +61,9 @@
 </template>
 
 <script>
-  import {db, func} from '../firebase';
+  import {db, func} from '../../firebase';
   import QRCode from "vue-qrcode-component";
+
   export default {
     components: {QRCode},
     data: () => ({
@@ -85,12 +74,14 @@
     }),
 
     beforeCreate() {
+      console.log(this.$route.params);
       const sid = this.$route.params.id;
-      if (!sid){
+      console.log(sid);
+      if (!sid) {
         this.$router.push('/');
         return;
       }
-      const dbRef = db.ref('session/' + id);
+      const dbRef = db.ref('session/' + sid);
 
       dbRef.once('value').then(snapshot => {
         if (snapshot.val() === null) {
@@ -103,10 +94,79 @@
         // console.log(sid, this.session);
       })
         .then(() => {
-          if (sid !== this.session.id) {
+          if (sid !== this.session.id || sid === null) {
             this.$router.push("/");
           }
         })
+        .catch(error => {
+          alert(error)
+          this.$router.push("/");
+        })
+    },
+
+    watch: {
+      emails() {
+        this.emailEmpty = this.emails.length === 0;
+      }
+    },
+
+    methods: {
+      remove(item) {
+        this.emails.splice(this.emails.indexOf(item), 1);
+        this.emails = [...this.emails]
+      },
+
+      sendMail() {
+        const link = 'https://' + this.url;
+        const {id, owner,name} = this.session;
+        const {username} = owner;
+        const dbRefs = db.ref("/emailProxy");
+        this.emails.forEach(mail => {
+          dbRefs.push({
+            mail: mail,
+            owner: username,
+            code: id,
+            link: link,
+            name: name,
+          });
+        });
+        this.emails = [];
+        alert("Email sent !");
+      },
     },
   }
 </script>
+
+<style scoped>
+  .qr-img {
+    display: block;
+    margin-right: auto;
+    margin-left: auto;
+    width: 50%;
+  }
+
+  .email-select {
+    max-width: 80%;
+    /*margin-left: auto;*/
+    /*margin-right: auto;*/
+    /*margin-top: 1em;*/
+    /*margin-bottom: 1em;*/
+    margin: 1em auto 1em;
+  }
+
+  .divider {
+    margin: 1em 0 1em;
+  }
+
+  .my-card {
+    margin: 2em;
+    padding: 2em;
+  }
+
+  .bgImg {
+    background-image: url("../../assets/bg/2.jpg");
+    min-height: 100%;
+    background-size: cover;
+  }
+
+</style>

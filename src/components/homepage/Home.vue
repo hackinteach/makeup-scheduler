@@ -21,7 +21,6 @@
     components: {
       JoinSession,
       AddSession,
-
     }
   }
 </script>
