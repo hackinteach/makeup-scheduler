@@ -74,6 +74,7 @@
     methods: {
       join() {
         const dummyEmail = this.username + "@makeupscheduler.com";
+        const username = this.username;
         const password = this.password;
         const code = this.code;
 
@@ -85,11 +86,30 @@
             // console.log("sessions",sessions);
             Object.values(sessions).map(
               s => {
+                const key = Object.keys(s)[0];
                 Object.values(s).map(
                   session => {
-                    if (session.id === code) {
+                    const existingUser = session.existUser;
+                    // console.log(existingUser);
+                    let userExists = false;
+                    if(existingUser != null){
+                      Object.values(existingUser).map(u => {
+                        if(username === u)
+                          userExists = true;
+                      });
+                    }
+                    if (session.id === code && userExists) {
+                      // console.log("Logged in");
+                      auth.signInWithEmailAndPassword(dummyEmail, password)
+                        .then(()=>{
+                          this.$router.push("/session/"+code);
+                        })
+                    }else if(session.id === code && !userExists){
+                      // console.log("User created");
                       auth.createUserWithEmailAndPassword(dummyEmail, password)
                         .then(() => {
+                          const userRefs = db.ref(`/session/${code}/${key}/existUser`);
+                          userRefs.push(username);
                           this.$router.push("/session/" + code);
                         })
                         .catch(err => alert(err));
@@ -100,8 +120,22 @@
             );
           }
         )
-
       },
+
+      checkUserExists(username,sid){
+        const dbRefs = db.ref(`session/${sid}/${username}`);
+        let valid = false;
+        dbRefs.once('value').then(snapshot=>{
+          const users = snapshot.val();
+          Object.keys(users).map(i=>{
+            const user = users[i];
+            if(username === user){
+              valid = true;
+            }
+          })
+        })
+          .then(() => valid)
+      }
     }
   }
 </script>
