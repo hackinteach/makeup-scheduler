@@ -222,7 +222,7 @@
                   existUser: [],
                 })
                 .then(
-                  snapshot => {
+                  () => {
                     this.$router.push(
                       {
                         path: 'info',

@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import Router from 'vue-router'
+import firebase from 'firebase';
 import Home from '../components/homepage/Home'
 import Personal from '../components/homepage/Personal'
 import Info from '../components/Info';

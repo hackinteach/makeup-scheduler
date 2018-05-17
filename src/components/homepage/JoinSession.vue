@@ -46,6 +46,7 @@
 
 <script>
   import {auth,db} from '../../firebase';
+  import firebase from 'firebase';
   export default{
     data: () => ({
       valid: false,

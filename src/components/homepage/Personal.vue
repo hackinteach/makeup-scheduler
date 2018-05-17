@@ -3,18 +3,15 @@
     <v-container text-xs-center>
       <v-flex xs6>
         <v-subheader>Choose Session Type</v-subheader>
-      </v-flex>
-      <v-flex xs6>
         <v-select
           :items="types"
           v-model="type"
-          label="Select"
+          label="Table view"
           single-line
         ></v-select>
       </v-flex>
       <v-layout row wrap>
         <v-flex xs12 class="my-flex">
-
           <v-layout>
             <v-flex xs12 class="my-flex">
               <v-card dark color="primary">
@@ -25,16 +22,9 @@
               <v-card dark color="primary">
                 <v-card-text class="px-0">{{ day.date }}</v-card-text>
               </v-card>
-              <!--<v-flex xs12 v-for="timeslot in timeslots" :key="timeslot.id">-->
-              <!--<v-card>-->
-              <!--<v-card-text class="px-0">{{ timeslot.start }}~</v-card-text>-->
-              <!--</v-card>-->
             </v-flex>
           </v-layout>
-
         </v-flex>
-
-
         <v-flex xs12 v-for="timeslot in timeslots" :key="timeslot.id">
           <v-layout>
             <v-flex xs12 class="my-flex">
@@ -50,48 +40,28 @@
                 </v-card-media>
                 <v-card-text class="px-0"></v-card-text>
               </v-card>
-              <!--<v-flex xs12 v-for="timeslot in timeslots" :key="timeslot.id">-->
-              <!--<v-card>-->
-              <!--<v-card-text class="px-0">{{ timeslot.start }}~</v-card-text>-->
-              <!--</v-card>-->
             </v-flex>
           </v-layout>
-
         </v-flex>
-
-
-        <!--<v-flex xs10>-->
-        <!--<v-container grid-list-md text-xs-center>-->
-        <!--<v-layout row wrap>-->
-
-        <!--<v-flex xs2 v-for="day in days" :key="day.id">-->
-        <!--<v-card dark color="primary">-->
-        <!--<v-card-text class="px-0">{{ day.name }}</v-card-text>-->
-        <!--</v-card>-->
-
-        <!--<template v-for="timeslot in timeslots">-->
-        <!--&lt;!&ndash;<v-flex xs2>&ndash;&gt;-->
-        <!--&lt;!&ndash;<v-card>&ndash;&gt;-->
-        <!--&lt;!&ndash;<v-card-text class="px-0">{{ timeslot.start }}~</v-card-text>&ndash;&gt;-->
-        <!--&lt;!&ndash;</v-card>&ndash;&gt;-->
-        <!--<v-flex v-on:click="getSlotId(day, timeslot)"-->
-        <!--v-bind:class="{'green' : findIsClicked(day, timeslot) >= 0}"-->
-        <!--&gt;-->
-        <!--<v-card>-->
-        <!--<v-card-text class="px-0"></v-card-text>-->
-        <!--</v-card>-->
-        <!--</v-flex>-->
-        <!--</template>-->
-
-
-
-        <!--</v-flex>-->
-        <!--</v-layout>-->
-        <!--</v-container>-->
-        <!--</v-flex>-->
+        <v-flex xs12 text-xs-center>
+          <v-btn raised color="primary" :disabled="type==='session'" @click.stop="confirmSubmit=true">submit</v-btn>
+          <v-btn raised color="secondary" @click="logout">logout</v-btn>
+          <v-btn raised @click="consoleOut">Log</v-btn>
+        </v-flex>
+        <!--Confirm Dialog-->
+        <v-dialog v-model="confirmSubmit" max-width="500px">
+          <v-card>
+            <v-card-title>
+              <span>Confirm change</span>
+            </v-card-title>
+            <v-card-actions>
+              <v-btn color="primary" flat @click="save">Save</v-btn>
+              <v-btn color="secondary" flat @click="confirmSubmit=false">Cancel</v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-dialog>
       </v-layout>
     </v-container>
-    <v-btn raised @click="save">submit</v-btn>
   </div>
 </template>
 
@@ -100,52 +70,54 @@
   import * as _ from 'lodash';
   import InfoDialog from '../session/InfoDialog';
 
-  /**
-   * expectation of db
-   * -sessionCode
-   *  -key
-   *    -users
-   *      -uid
-   *        -index of time user is not free
-   *          -{dayId:, timeId}
-   */
   export default {
-    created() {
+
+    beforeMount() {
       this.generateDate();
       /* Initialize personal table*/
-      const code = this.$route.params.id
-      console.log(auth.currentUser);
-      const uid = auth.currentUser.uid;
-      console.log('uid', uid);
+      const code = this.$route.params.id;
       const dbRefs = db.ref("/session/" + code + "/users/");
-      dbRefs.once("value").then((snapshot) => {
-          // console.log(snapshot.val());
-          const uu = snapshot.val();
-          console.log('uu',uu[uid]);
-          const use = uu[uid];
-          if(!use){
-            this.clicked = [{"dayId" : 0, "timeId" : 0 }];
-          }else{
-            this.clicked = uu[uid];
-          }
-          console.log("clicked in created", this.clicked)
+      // console.log(auth.currentUser);
+      auth.onAuthStateChanged(user => {
+        if (user) {
+          const uid = auth.currentUser.uid;
+          // console.log('uid', uid);
+          dbRefs.once("value").then((snapshot) => {
+              // console.log(snapshot.val());
+              const uu = snapshot.val();
+              // console.log('uu', uu[uid]);
+              const use = uu[uid];
+              if (!use) {
+                this.clicked = [{"dayId": 0, "timeId": 0}];
+              } else {
+                this.clicked = uu[uid];
+              }
+              // console.log("clicked in created", this.clicked)
+            }
+          )
+        } else {
+          this.clicked = [{"dayId": 0, "timeId": 0}];
         }
-      )
+      })
 
-      /* Listener fo realtime session table */
+
+      /* Listener fo real time session table */
       dbRefs.on("child_changed", (snapshot) => {
-        console.log("changed");
         const users = snapshot.val();
+        // console.log('data changed',users);
         if (this.type === 'session') {
           let u;
           let tt = [];
           for (u in users) {
+            console.log('u in user',users[u]);
             const userTime = users[u];
-            Object.values(userTime).map(t => {
-              tt.push(t)
-            })
+            tt.push(userTime)
           }
-          this.clicked = _.uniqWith(tt, _.isEqual)
+          tt =  _.uniqWith(tt, _.isEqual);
+          // this.clicked.concat(tt);
+          this.updateSession(tt);
+          // console.log(this.clicked);
+          // console.log(tt);
         }
       })
     },
@@ -154,7 +126,8 @@
         types: [
           "personal", "session"
         ],
-        type: "personal",
+        type: 'personal',
+        confirmSubmit: false,
         timetable: [],
         sessionCode: this.$route.params.id,
         newLessonName: '',
@@ -223,10 +196,13 @@
             'end': '20:00'
           }
         ],
-        clicked: [{"dayId" : 0, "timeId" : 0 }],
+        clicked: [{"dayId": 0, "timeId": 0}],
       }
     },
     watch: {
+      click(){
+
+      },
       type() {
         const code = this.$route.params.id;
         const dbRefs = db.ref("/session/" + code + "/users");
@@ -258,39 +234,22 @@
       }
     },
     methods: {
-
+      consoleOut(){
+        console.log(this.clicked);
+      },
+      updateSession(updated){
+        this.clicked.concat(updated);
+      },
+      logout() {
+        auth.logout()
+          .then(()=>this.$router.push('/'));
+      },
       save() {
+        this.confirmSubmit = false;
         const code = this.$route.params.id;
         const uid = auth.currentUser.uid;
         const dbRefs = db.ref(`session/${code}/users/`);
         dbRefs.update({[uid]: this.clicked});
-        // dbRefs.once('value').then(
-        //   snapshot => {
-        //     const sId = snapshot.val();
-        //     console.log('sId',sId)
-        //     Object.keys(sId).map(id => {
-        //       console.log('id',id);
-        //       const session = sId[id];
-        //       const time = session.studentTimeSlot;
-        //       console.log("before anything",time);
-        //       if (!session.studentTimeSlot){
-        //         console.log("not made yet");
-        //         dbRefs.update({users: {[uid]: this.clicked}})
-        //       }
-        //       else{
-        //         console.log("already have one")
-        //         this.clicked.forEach(x => {
-        //           time.push({
-        //             dayId: x.dayId,
-        //             timeId: x.timeId
-        //           })
-        //         });
-        //         let t = _.uniqWith(time, _.isEqual)
-        //         console.log(t);
-        //         dbRefs.update({users: {[uid]: t}})
-        //       }
-        //     })
-        // })
       },
 
       getNextDate(year, month, day) {
@@ -380,25 +339,6 @@
           this.clicked.push({'dayId': day.id, 'timeId': timeslot.id})
         }
       }
-
-      // async getWeek(){
-      //   const code  = this.$route.params.id;
-      //   const dbRefs = db.ref("/session/"+code);
-      //   let startDate;
-      //   dbRefs.once('value').then(
-      //     snapshot => {
-      //       const sId = snapshot.val();
-      //       console.log('sId',sId)
-      //       Object.keys(sId).map(id => {
-      //         console.log('id',id);
-      //         const session = sId[id];
-      //         console.log(session.startDate);
-      //         startDate=session.startDate;
-      //         return startDate
-      //       })
-      //     }
-      //   )
-      // }
     }
   }
 </script>
@@ -419,7 +359,6 @@
     user-select: none;
     /* Required to make elements draggable in old WebKit */
     -webkit-user-drag: element;
-    cursor: move;
     cursor: move;
   }
 </style>
