@@ -123,11 +123,12 @@
           const uu = snapshot.val();
           console.log('uu',uu[uid]);
           const use = uu[uid];
-          if(use === null){
-
+          if(!use){
+            this.clicked = [{"dayId" : 0, "timeId" : 0 }];
           }else{
             this.clicked = uu[uid];
           }
+          console.log("clicked in created", this.clicked)
         }
       )
 
@@ -221,7 +222,7 @@
             'end': '20:00'
           }
         ],
-        clicked: [],
+        clicked: [{"dayId" : 0, "timeId" : 0 }],
       }
     },
     watch:{
@@ -316,7 +317,7 @@
         dbRefs.once('value').then(
           snapshot => {
             const sId = snapshot.val();
-            console.log('sId',sId)
+            // console.log('sId',sId)
             Object.keys(sId).map(id => {
               if(id !== "users"){
                 console.log('id',id);
@@ -339,7 +340,7 @@
                   day = nextDay[2]
                   lst.push({'id' : i+1,  'date' : day+"/"+month+"/"+year})
                 }
-                console.log(lst);
+                // console.log(lst);
                 this.days = lst;
               }
             })
