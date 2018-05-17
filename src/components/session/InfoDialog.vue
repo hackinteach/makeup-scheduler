@@ -5,8 +5,8 @@
       <v-dialog v-model="dialog2" max-width="500px">
         <v-container row wrap grid-list-xs text-xs-center>
           <v-layout row wrap>
-            <v-flex xs12>
-              <v-card raised class="my-card">
+            <v-flex xs12 class="the-flex">
+              <v-card flat class="my-card">
                 <p class="headline">Class Summary : {{session.name}}</p>
                 <!-- CODE -->
                 <a class="subheading" :style="{color: 'black'}">Join Code</a>
@@ -57,6 +57,8 @@
                   <v-icon color="grey darken-2">send</v-icon>
                 </v-btn>
                 <v-divider class="divider"/>
+                <v-btn
+                  @click="dialog2 = false" color="primary" raised>Close</v-btn>
               </v-card>
             </v-flex>
           </v-layout>
@@ -172,10 +174,8 @@
     padding: 2em;
   }
 
-  .bgImg {
-    background-image: url("../../assets/bg/2.jpg");
-    min-height: 100%;
-    background-size: cover;
+  .the-flex {
+    background-color: white;
   }
 
 </style>

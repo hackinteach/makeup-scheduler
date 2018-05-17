@@ -1,7 +1,7 @@
 <template>
-  <div>
-    <v-container text-xs-center>
-      <v-flex xs6>
+  <v-container class="my-div">
+    <v-container text-xs-center class="my-container" grid-list-xs>
+      <v-flex xs6 :style="{backgroundColor: 'rgba(255,255,255,0.7)',minWidth: '100%',padding: '1em'}">
         <v-subheader>Choose Session Type</v-subheader>
         <v-select
           :items="types"
@@ -28,13 +28,13 @@
         <v-flex xs12 v-for="timeslot in timeslots" :key="timeslot.id">
           <v-layout>
             <v-flex xs12 class="my-flex">
-              <v-card>
+              <v-card flat>
                 <v-card-text class="px-0">{{ timeslot.start }}~</v-card-text>
               </v-card>
             </v-flex>
             <v-flex xs12 v-for="day in days" :key="day.id"
                     v-on:click="type === 'personal' ? getSlotId(day, timeslot) : ()=>{}">
-              <v-card tile
+              <v-card tile flat
                       v-bind:class="[findIsClicked(day, timeslot) >= 0 ? 'green' : 'my-flex']">
                 <v-card-media height="20px">
                 </v-card-media>
@@ -43,10 +43,11 @@
             </v-flex>
           </v-layout>
         </v-flex>
-        <v-flex xs12 text-xs-center>
+        <v-flex xs12 text-xs-center :style="{backgroundColor: 'rgba(255,255,255,0.7)',minWidth: '100%',padding: '1em'}">
           <v-btn raised color="primary" :disabled="type==='session'" @click.stop="confirmSubmit=true">submit</v-btn>
           <v-btn raised color="secondary" @click="logout">logout</v-btn>
-          <v-btn raised @click="consoleOut">Log</v-btn>
+          <!--<v-btn raised @click="consoleOut">Log</v-btn>-->
+          <InfoDialog/>
         </v-flex>
         <!--Confirm Dialog-->
         <v-dialog v-model="confirmSubmit" max-width="500px">
@@ -62,7 +63,7 @@
         </v-dialog>
       </v-layout>
     </v-container>
-  </div>
+  </v-container>
 </template>
 
 <script>
@@ -71,7 +72,7 @@
   import InfoDialog from '../session/InfoDialog';
 
   export default {
-
+    components: {InfoDialog},
     beforeMount() {
       this.generateDate();
       /* Initialize personal table*/
@@ -109,13 +110,14 @@
           let u;
           let tt = [];
           for (u in users) {
-            console.log('u in user',users[u]);
+            console.log('u in user', users[u]);
             const userTime = users[u];
             tt.push(userTime)
           }
-          tt =  _.uniqWith(tt, _.isEqual);
+          tt = _.uniqWith(tt, _.isEqual);
+          this.toUpdate = tt;
           // this.clicked.concat(tt);
-          this.updateSession(tt);
+
           // console.log(this.clicked);
           // console.log(tt);
         }
@@ -197,23 +199,21 @@
           }
         ],
         clicked: [{"dayId": 0, "timeId": 0}],
+        toUpdate: [],
       }
     },
     watch: {
-      click(){
-
-      },
       type() {
         const code = this.$route.params.id;
         const dbRefs = db.ref("/session/" + code + "/users");
         if (this.type === "personal") {
           let uid = auth.currentUser.uid;
-          console.log(dbRefs)
+          // console.log(dbRefs);
           dbRefs.once("value").then((snapshot) => {
-            console.log(snapshot.val()[uid]);
+            // console.log(snapshot.val()[uid]);
             const uu = snapshot.val()[uid];
             this.clicked = uu;
-            console.log("personal clicked at watch", this.clicked)
+            // console.log("personal clicked at watch", this.clicked)
           }, function (errorObject) {
             alert("The read failed: " + errorObject.code);
           });
@@ -234,15 +234,12 @@
       }
     },
     methods: {
-      consoleOut(){
+      consoleOut() {
         console.log(this.clicked);
-      },
-      updateSession(updated){
-        this.clicked.concat(updated);
       },
       logout() {
         auth.logout()
-          .then(()=>this.$router.push('/'));
+          .then(() => this.$router.push('/'));
       },
       save() {
         this.confirmSubmit = false;
@@ -291,7 +288,7 @@
                 let nextDay;
                 let lst = [{
                   'id': 1, 'date': day + "/" + month + "/" + year
-                }]
+                }];
                 let i;
                 for (i = 1; i < 7; i++) {
                   nextDay = this.getNextDate(year, month, day)
@@ -353,6 +350,13 @@
     padding: 0px
   }
 
+  .my-container {
+    background-color: rgba(0, 0, 0, 0.3);
+    margin-top: 2em;
+    margin-bottom: 2em;
+    padding: 2em;
+  }
+
   [draggable] {
     -moz-user-select: none;
     -webkit-user-select: none;
@@ -361,4 +365,13 @@
     -webkit-user-drag: element;
     cursor: move;
   }
+
+  .my-div{
+    background-image: url('../../assets/bg/3.jpg');
+    background-size: cover;
+    min-width: 100%;
+    min-height:100%;
+    background-position-x: left;
+  }
+
 </style>
