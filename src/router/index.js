@@ -1,10 +1,11 @@
-import Vue from 'vue'
-import Router from 'vue-router'
-import Home from '../components/homepage/Home'
-import Session from '../components/homepage/Session'
+import Vue from 'vue';
+import Router from 'vue-router';
+import Home from '../components/homepage/Home';
+import Session from '../components/homepage/Session';
 import Info from '../components/Info';
 import {auth, db} from '../firebase'
 import InfoDialog from '../components/session/InfoDialog';
+
 Vue.use(Router);
 
 const AuthGuard = (to, from, next) => {
@@ -50,7 +51,7 @@ export default new Router({
     },
     {
       path: '/dialog/:id',
-      name: 'Session Information',
+      name: 'Session Information 2',
       component: InfoDialog,
     }
   ]
