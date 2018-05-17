@@ -43,7 +43,7 @@
               </v-card>
             </v-flex >
             <v-flex xs12 v-for="day in days" :key="day.id"
-                    v-on:click="getSlotId(day, timeslot)" >
+                    v-on:click="type === 'personal' ? getSlotId(day, timeslot) : ()=>{}" >
               <v-card tile
                       v-bind:class="[findIsClicked(day, timeslot) >= 0 ? 'green' : 'my-flex']">
                 <v-card-media height="20px">
@@ -121,26 +121,31 @@
       dbRefs.once("value").then((snapshot) => {
           // console.log(snapshot.val());
           const uu = snapshot.val();
-          console.log('uu',uu);
-          this.clicked = uu;
+          console.log('uu',uu[uid]);
+          const use = uu[uid];
+          if(use === null){
+
+          }else{
+            this.clicked = uu[uid];
+          }
         }
       )
 
         /* Listener fo realtime session table */
-      dbRefs.on("child_changed", (snapshot)=> {
-        const users = snapshot.val();
-        if(this.type==='session'){
-          let u;
-          let tt = [];
-          for (u in users){
-            const userTime = users[u];
-            Object.values(userTime).map(t => {
-              tt.push(t)
-            })
-          }
-          this.clicked = _.uniqWith(tt, _.isEqual)
-        }
-      })
+      // dbRefs.on("child_changed", (snapshot)=> {
+      //   const users = snapshot.val();
+      //   if(this.type==='session'){
+      //     let u;
+      //     let tt = [];
+      //     for (u in users){
+      //       const userTime = users[u];
+      //       Object.values(userTime).map(t => {
+      //         tt.push(t)
+      //       })
+      //     }
+      //     this.clicked = _.uniqWith(tt, _.isEqual)
+      //   }
+      // })
     },
     data () {
       return {
@@ -344,6 +349,9 @@
 
       findIsClicked(day, timeslot){
         var i;
+        if (this.clicked == null){
+          return -1;
+        }
         if (this.clicked.length == 0){
           return -1;
         }
@@ -359,9 +367,10 @@
       },
 
       getSlotId (day, timeslot){
-        // console.log(this.clicked)
+        console.log(this.clicked)
         console.log(day.id+"-> "+timeslot.id)
         const idx = this.findIsClicked(day, timeslot)
+        console.log("onclicked", this.clicked)
         if (idx >= 0){
           this.clicked.splice(idx, 1)
         }
