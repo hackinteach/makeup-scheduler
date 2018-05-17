@@ -84,6 +84,7 @@
         <!--</template>-->
 
 
+
         <!--</v-flex>-->
         <!--</v-layout>-->
         <!--</v-container>-->
@@ -120,13 +121,14 @@
       dbRefs.once("value").then((snapshot) => {
           // console.log(snapshot.val());
           const uu = snapshot.val();
-          console.log('uu', uu[uid]);
+          console.log('uu',uu[uid]);
           const use = uu[uid];
-          if (use === null) {
-
-          } else {
+          if(!use){
+            this.clicked = [{"dayId" : 0, "timeId" : 0 }];
+          }else{
             this.clicked = uu[uid];
           }
+          console.log("clicked in created", this.clicked)
         }
       )
 
@@ -221,7 +223,7 @@
             'end': '20:00'
           }
         ],
-        clicked: [],
+        clicked: [{"dayId" : 0, "timeId" : 0 }],
       }
     },
     watch: {
