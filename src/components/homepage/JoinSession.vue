@@ -113,7 +113,10 @@
                         .then(() => {
                           const userRefs = db.ref(`/session/${code}/${key}/existUser`);
                           userRefs.push(username);
-                          this.$router.push("/session/" + code);
+                          auth.setPersistence(firebase.auth.Auth.Persistence.SESSION)
+                            .then(
+                              ()=>this.$router.push("/session/"+code)
+                            );
                         })
                         .catch(err => alert(err));
                     }
@@ -125,20 +128,6 @@
         )
       },
 
-      checkUserExists(username,sid){
-        const dbRefs = db.ref(`session/${sid}/${username}`);
-        let valid = false;
-        dbRefs.once('value').then(snapshot=>{
-          const users = snapshot.val();
-          Object.keys(users).map(i=>{
-            const user = users[i];
-            if(username === user){
-              valid = true;
-            }
-          })
-        })
-          .then(() => valid)
-      }
     }
   }
 </script>
