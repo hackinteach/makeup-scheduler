@@ -69,7 +69,7 @@
 <script>
   import {auth, db} from '../../firebase';
   import * as _ from 'lodash';
-  import InfoDialog from '../session/InfoDialog';
+  import InfoDialog from '../InfoDialog';
 
   export default {
     components: {InfoDialog},

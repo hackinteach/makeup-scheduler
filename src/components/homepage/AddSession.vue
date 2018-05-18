@@ -223,16 +223,17 @@
                 })
                 .then(
                   () => {
-                    this.$router.push(
-                      {
-                        path: 'info',
-                        query:
-                          {
-                            id: sid,
-                            name: subject
-                          }
-                      }
-                    )
+                    // this.$router.push(
+                    //   {
+                    //     path: 'info',
+                    //     query:
+                    //       {
+                    //         id: sid,
+                    //         name: subject
+                    //       }
+                    //   }
+                    // )
+                    this.$router.dispatch('userSignIn',{email:email,password:password,code:sid})
                   }
                 )
                 .catch(err => alert(err))

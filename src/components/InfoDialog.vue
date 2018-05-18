@@ -69,7 +69,7 @@
 </template>
 
 <script>
-  import {db, func} from '../../firebase';
+  import {db, func} from '../firebase';
   import QRCode from "vue-qrcode-component";
 
   export default {

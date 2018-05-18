@@ -70,7 +70,7 @@
       <v-flex xs12 text-xs-center :style="{backgroundColor: 'rgba(255,255,255,0.7)',minWidth: '100%',padding: '1em'}">
         <v-btn raised color="primary" :disabled="type==='session'" @click.stop="confirmSubmit=true">submit</v-btn>
         <v-btn raised color="secondary" @click="logout">logout</v-btn>
-        <!--<v-btn raised @click="consoleOut">Log</v-btn>-->
+        <!--<v-btn raised @click="nooo">Log</v-btn>-->
         <info-dialog/>
       </v-flex>
     </v-container>
@@ -80,8 +80,9 @@
 <script>
   import {db, auth} from '../../firebase';
   import * as _ from 'lodash';
-  import InfoDialog from '../session/InfoDialog';
+  import InfoDialog from '../InfoDialog';
   import Info from "../Info";
+
   export default {
     components: {InfoDialog, Info},
     beforeMount() {
@@ -89,56 +90,57 @@
       this.code = this.$route.params.id;
       const {code} = this;
       const dbRefs = db.ref("/session/" + code + "/usersData/");
-      const uid = auth.currentUser.uid;
-      if(code === null){
+
+      if (code === null) {
         alert("Permission Denied!");
         this.$router.push("/");
       }
-      // console.log(auth.currentUser);
-      let tempTable = _.map(this.table, _.clone);
+
       auth.onAuthStateChanged(user => {
+        let tempTable = _.map(this.table, _.clone);
         if (user) {
+          const uid = auth.currentUser.uid;
           dbRefs.once("value").then((snapshot) => {
               const users = snapshot.val();
               const currentUser = users[uid];
               // console.log('currUserObj',currentUser);
-              Object.keys(currentUser).map(key=>{
-                const {i,j} = currentUser[key];
+              Object.keys(currentUser).map(key => {
+                const {i, j} = currentUser[key];
                 tempTable[i][j] = true;
               })
             }
             )
-            .then(()=>{
+            .then(() => {
               this.table = tempTable;
             })
         }
       })
 
-      // dbRefs.on("child_changed", (snapshot) => {
-      //   const users = snapshot.val();
-      //   // console.log('data changed',users);
-      //   if (this.type === 'session') {
-      //     let u;
-      //     let tt = [];
-      //     for (u in users) {
-      //       console.log('u in user', users[u]);
-      //       const userTime = users[u];
-      //       tt.push(userTime)
-      //     }
-      //     tt = _.uniqWith(tt, _.isEqual);
-      //     this.toUpdate = tt;
-      //     // this.clicked.concat(tt);
-      //
-      //     // console.log(this.clicked);
-      //     // console.log(tt);
-      //   }
-      // })
+      dbRefs.on("child_changed", (snapshot) => {
+        const users = snapshot.val();
+        let tempTable = _.map(this.table, _.clone);
+        // console.log('data changed',users);
+        if (this.type === 'session') {
+          dbRefs.once("value").then(snapshot => {
+              const userData = snapshot.val();
+              _.values(userData).map((user, id) => {
+                _.values(user).map((val, idx) => {
+                  const {i, j} = val;
+                  tempTable[i][j] = true;
+                })
+              })
+            })
+            .then(() => {
+              this.table = tempTable;
+            })
+        }
+      })
     },
     data() {
       return {
         type: 'personal',
         types: [
-          'personal','session'
+          'personal', 'session'
         ],
         code: '',
         confirmSubmit: false,
@@ -163,14 +165,52 @@
           '17.00', '18.00', '19.00', '20.00'],
       }
     },
-    watch:{
-      type(){
-
+    watch: {
+      type(change) {
+        if (change === 'personal') {
+          this.getPersonalTable();
+        }else{
+          this.getSession();
+        }
       }
     },
     methods: {
 
-      submit(){
+      getPersonalTable() {
+        let tempTable = _.map(this.table, _.clone);
+        const dbRefs = db.ref("/session/" + this.code + "/usersData/");
+        const uid = auth.currentUser.uid;
+        dbRefs.once("value").then((snapshot) => {
+            const users = snapshot.val();
+            const currentUser = users[uid];
+            Object.keys(currentUser).map(key => {
+              const {i, j} = currentUser[key];
+              tempTable[i][j] = true;
+            })
+          }
+          )
+          .then(() => {
+            this.table = tempTable;
+          })
+      },
+
+      getSession() {
+        const {code} = this;
+        const dbRefs = db.ref("/session/" + code + "/usersData/");
+        let tempTable = _.map(this.table, _.clone);
+        dbRefs.once("value").then(snapshot => {
+            const userData = snapshot.val();
+            _.values(userData).map((user, id) => {
+              _.values(user).map((val, idx) => {
+                const {i, j} = val;
+                tempTable[i][j] = true;
+              })
+            })
+          })
+          .then(() => this.table = tempTable);
+      },
+
+      submit() {
         this.confirmSubmit = false;
         const {code} = this;
         const uid = auth.currentUser.uid;
@@ -184,9 +224,9 @@
             })
           });
         /* Push new data to db */
-        this.table.forEach((row,i) => {
-          row.forEach((cell,j) => {
-            if(cell){
+        this.table.forEach((row, i) => {
+          row.forEach((cell, j) => {
+            if (cell) {
               dbRefs.push({
                 i: i,
                 j: j
@@ -196,7 +236,7 @@
         })
       },
 
-      toggle(i,j){
+      toggle(i, j) {
         let newTable = _.map(this.table, _.clone);
         newTable[i][j] = !this.table[i][j];
         this.table = newTable;
@@ -315,9 +355,8 @@
         )
       },
 
-      logout(){
-        auth.logout()
-          .then(()=> this.$router.push("/"));
+      logout() {
+        this.$store.dispatch('userSignOut')
       }
     }
   }

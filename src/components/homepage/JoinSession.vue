@@ -74,10 +74,8 @@
 
     methods: {
       join() {
-        const dummyEmail = this.username + "@makeupscheduler.com";
-        const username = this.username;
-        const password = this.password;
-        const code = this.code;
+        const {username, password, code} = this;
+        const dummyEmail = username + "@makeupscheduler.com";
 
         const dbRefs = db.ref("/session");
         // console.log('code',code);
@@ -100,26 +98,28 @@
                       });
                     }
                     if (session.id === code && userExists) {
+                      this.$store.dispatch('userSignIn', {email: dummyEmail, password: password, code: code})
                       // console.log("Logged in");
-                      auth.signInWithEmailAndPassword(dummyEmail, password)
-                        .then(()=>{
-                          auth.setPersistence(firebase.auth.Auth.Persistence.SESSION)
-                            .then(
-                              ()=>this.$router.push("/session/"+code)
-                            )
-                        })
+                      // auth.signInWithEmailAndPassword(dummyEmail, password)
+                      //   .then(()=>{
+                      //     auth.setPersistence(firebase.auth.Auth.Persistence.SESSION)
+                      //       .then(
+                      //         ()=>this.$router.push("/session/"+code)
+                      //       )
+                      //   })
                     }else if(session.id === code && !userExists){
                       // console.log("User created");
-                      auth.createUserWithEmailAndPassword(dummyEmail, password)
-                        .then(() => {
-                          const userRefs = db.ref(`/session/${code}/${key}/existUser`);
-                          userRefs.push(username);
-                          auth.setPersistence(firebase.auth.Auth.Persistence.SESSION)
-                            .then(
-                              ()=>this.$router.push("/session/"+code)
-                            );
-                        })
-                        .catch(err => alert(err));
+                      // auth.createUserWithEmailAndPassword(dummyEmail, password)
+                      //   .then(() => {
+                      //     const userRefs = db.ref(`/session/${code}/${key}/existUser`);
+                      //     userRefs.push(username);
+                      //     auth.setPersistence(firebase.auth.Auth.Persistence.SESSION)
+                      //       .then(
+                      //         ()=>this.$router.push("/session/"+code)
+                      //       );
+                      //   })
+                      //   .catch(err => alert(err));
+                      this.$store.dispatch('userSignUp',{email:dummyEmail, password: password, code: code});
                     }
                   }
                 )
