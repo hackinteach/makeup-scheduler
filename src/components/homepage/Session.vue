@@ -1,6 +1,15 @@
 <template>
   <v-container class="my-div">
     <v-container text-xs-center class="my-container" grid-list-xs>
+      <v-flex xs6 :style="{backgroundColor: 'rgba(255,255,255,0.7)',minWidth: '100%',padding: '1em'}">
+        <v-subheader>Choose Session Type</v-subheader>
+        <v-select
+          :items="types"
+          v-model="type"
+          label="Table view"
+          single-line
+        ></v-select>
+      </v-flex>
       <v-layout row wrap class="my-layout">
         <!-- DATE ROW -->
         <v-flex xs12 class="my-flex">
@@ -45,22 +54,94 @@
             </v-flex>
           </v-layout>
         </v-flex>
+        <!--Confirm Dialog-->
+        <v-dialog v-model="confirmSubmit" max-width="500px">
+          <v-card>
+            <v-card-title>
+              <span>Confirm change</span>
+            </v-card-title>
+            <v-card-actions>
+              <v-btn color="primary" flat @click="submit">Save</v-btn>
+              <v-btn color="secondary" flat @click="confirmSubmit=false">Cancel</v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-dialog>
       </v-layout>
+      <v-flex xs12 text-xs-center :style="{backgroundColor: 'rgba(255,255,255,0.7)',minWidth: '100%',padding: '1em'}">
+        <v-btn raised color="primary" :disabled="type==='session'" @click.stop="confirmSubmit=true">submit</v-btn>
+        <v-btn raised color="secondary" @click="logout">logout</v-btn>
+        <!--<v-btn raised @click="consoleOut">Log</v-btn>-->
+        <info-dialog/>
+      </v-flex>
     </v-container>
   </v-container>
 </template>
 
 <script>
-  import {db, auth} from '../firebase';
+  import {db, auth} from '../../firebase';
   import * as _ from 'lodash';
+  import InfoDialog from '../session/InfoDialog';
+  import Info from "../Info";
   export default {
+    components: {InfoDialog, Info},
     beforeMount() {
       this.newDate();
+      this.code = this.$route.params.id;
+      const {code} = this;
+      const dbRefs = db.ref("/session/" + code + "/usersData/");
+      const uid = auth.currentUser.uid;
+      if(code === null){
+        alert("Permission Denied!");
+        this.$router.push("/");
+      }
+      // console.log(auth.currentUser);
+      let tempTable = _.map(this.table, _.clone);
+      auth.onAuthStateChanged(user => {
+        if (user) {
+          dbRefs.once("value").then((snapshot) => {
+              const users = snapshot.val();
+              const currentUser = users[uid];
+              // console.log('currUserObj',currentUser);
+              Object.keys(currentUser).map(key=>{
+                const {i,j} = currentUser[key];
+                tempTable[i][j] = true;
+              })
+            }
+            )
+            .then(()=>{
+              this.table = tempTable;
+            })
+        }
+      })
+
+      // dbRefs.on("child_changed", (snapshot) => {
+      //   const users = snapshot.val();
+      //   // console.log('data changed',users);
+      //   if (this.type === 'session') {
+      //     let u;
+      //     let tt = [];
+      //     for (u in users) {
+      //       console.log('u in user', users[u]);
+      //       const userTime = users[u];
+      //       tt.push(userTime)
+      //     }
+      //     tt = _.uniqWith(tt, _.isEqual);
+      //     this.toUpdate = tt;
+      //     // this.clicked.concat(tt);
+      //
+      //     // console.log(this.clicked);
+      //     // console.log(tt);
+      //   }
+      // })
     },
     data() {
       return {
-        cI: null,
-        cJ: null,
+        type: 'personal',
+        types: [
+          'personal','session'
+        ],
+        code: '',
+        confirmSubmit: false,
         days: [],
         table: [
           [false, false, false, false, false, false, false],
@@ -77,23 +158,45 @@
           [false, false, false, false, false, false, false],
           [false, false, false, false, false, false, false],
         ],
-        timeslots: ["8.00", "9.00", '10.00', '11.00', '12.00',
-          '13.00', '14.00', '15.00', '16.00', '17.00', '18.00', '19.00', '20.00'],
-
+        timeslots: ["8.00", "9.00", '10.00', '11.00',
+          '12.00', '13.00', '14.00', '15.00', '16.00',
+          '17.00', '18.00', '19.00', '20.00'],
       }
     },
     watch:{
-      // table:  {
-      //   handler: function(newValue) {
-      //     console.log("changed from watch", newValue);
-      //   },
-      //   deep: true,
-      // }
+      type(){
+
+      }
     },
     methods: {
+
+      submit(){
+        this.confirmSubmit = false;
+        const {code} = this;
+        const uid = auth.currentUser.uid;
+        const dbRefs = db.ref(`/session/${code}/usersData/${uid}`);
+        /* Clear old data, prevent duplicates */
+        dbRefs.once('value')
+          .then(snapshot => {
+            const users = snapshot.val();
+            Object.keys(users).map(u => {
+              dbRefs.child(u).remove();
+            })
+          });
+        /* Push new data to db */
+        this.table.forEach((row,i) => {
+          row.forEach((cell,j) => {
+            if(cell){
+              dbRefs.push({
+                i: i,
+                j: j
+              });
+            }
+          })
+        })
+      },
+
       toggle(i,j){
-        console.log(`${i} ${j} clicked`);
-        console.log(`before ${this.table[i][j]}`);
         let newTable = _.map(this.table, _.clone);
         newTable[i][j] = !this.table[i][j];
         this.table = newTable;
@@ -211,6 +314,11 @@
           }
         )
       },
+
+      logout(){
+        auth.logout()
+          .then(()=> this.$router.push("/"));
+      }
     }
   }
 </script>
@@ -251,7 +359,7 @@
   }
 
   .my-div {
-    background-image: url('../assets/bg/3.jpg');
+    background-image: url('../../assets/bg/3.jpg');
     background-size: cover;
     min-width: 100%;
     min-height: 100%;

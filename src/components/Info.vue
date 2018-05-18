@@ -133,7 +133,8 @@
       },
 
       next(){
-        this.$router.push("/session/"+this.$route.queries.id);
+        // console.log(`Pushed ${this.$route.query.id}`);
+        this.$router.push("/session/"+this.$route.query.id);
       }
     },
   }
