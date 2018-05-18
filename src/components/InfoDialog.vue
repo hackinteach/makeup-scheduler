@@ -84,9 +84,9 @@
     }),
 
     created() {
-      console.log(this.$route.params);
+      // console.log(this.$route.params);
       const sid = this.$route.params.id;
-      console.log(sid);
+      // console.log(sid);
       if (!sid) {
         this.$router.push('/');
         return;
