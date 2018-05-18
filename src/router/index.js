@@ -6,7 +6,7 @@ import Session from '../components/homepage/Session';
 import {auth} from '../firebase';
 Vue.use(Router);
 const AuthGuard = (to, from, next) => {
-  if (firebase.auth().currentUser) {
+  if (auth.currentUser) {
     next()
   } else {
     next('/')

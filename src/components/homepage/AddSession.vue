@@ -154,7 +154,7 @@
       emailRule: [
         v => !!v || 'E-mail is required',
         v => /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
-  .test(v) || 'E-mail must be valid'
+          .test(v) || 'E-mail must be valid'
       ],
       subject: '',
       subjectRule: [
@@ -199,11 +199,11 @@
         e.preventDefault();
         if (this.$refs.form.validate()) {
           const {classPeriod, startDateFormatted, endDateFormatted, description, email, subject, username, password} = this.$data;
-          auth.createUserWithEmailAndPassword(email, password)
+          const sid = Math.random().toString(36).substring(2, 8) + Math.random().toString(36).substring(2, 5);
+          auth.createUserWithEmailAndPassword(username + "@makeupscheduler.com", password)
             .then(() => {
               const user = auth.currentUser.uid;
-              const sid = Math.random().toString(36).substring(2, 8) + Math.random().toString(36).substring(2, 5);
-              const dbRefs = db.ref('session/'+sid );
+              const dbRefs = db.ref('session/' + sid);
               dbRefs.push(
                 /* Session object */
                 {
@@ -223,21 +223,31 @@
                 })
                 .then(
                   () => {
-                    // this.$router.push(
-                    //   {
-                    //     path: 'info',
-                    //     query:
-                    //       {
-                    //         id: sid,
-                    //         name: subject
-                    //       }
-                    //   }
-                    // )
-                    this.$router.dispatch('userSignIn',{email:email,password:password,code:sid})
+                    const link = 'https://makeup-scheduler.firebaseapp.com/session/' + sid;
+                    const {username, email} = this;
+                    const dbRefs = db.ref("/emailProxy");
+                    dbRefs.push({
+                      mail: email,
+                      owner: username,
+                      code: sid,
+                      link: link,
+                      name: username,
+                    });
+
+                    this.$router.push(
+                      {
+                        path: 'info',
+                        query:
+                          {
+                            id: sid,
+                            name: subject
+                          }
+                      }
+                    )
                   }
                 )
-                .catch(err => alert(err))
-            }).catch(err => alert(err));
+              // .catch(err => alert(err))
+            }).catch(err => console.log(err));
         }
 
       }

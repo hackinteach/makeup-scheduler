@@ -36,7 +36,7 @@
             </v-flex>
             <v-flex
               xs12 v-for="(cell,j) in row" :key="j" class="my-flex"
-              @click="()=>toggle(i,j)">
+              @click="()=>type==='personal'?toggle(i,j):{}">
               <v-card tile flat v-if="cell"
                       class="green">
                 <v-card-media height="20px">

@@ -1,9 +1,9 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import firebase from '../firebase'
-import router from '@/router'
+import router from '../router'
 
-Vue.use(Vuex)
+Vue.use(Vuex);
 
 export const session = new Vuex.Store({
   state: {
