@@ -280,7 +280,23 @@
                 // console.log('id',id);
                 const session = sId[id];
                 // console.log(session.startDate);
-                startDate = session.startDate;
+                let startDate = session.startDate;
+                if (startDate === null) {
+                  let today = new Date();
+                  let dd = today.getDate();
+                  let mm = today.getMonth() + 1; //January is 0!
+                  let yyyy = today.getFullYear();
+
+                  if (dd < 10) {
+                    dd = '0' + dd
+                  }
+
+                  if (mm < 10) {
+                    mm = '0' + mm
+                  }
+
+                  startDate = `${mm}/${dd}/${yyyy}`
+                }
                 let dateSplit = startDate.split("/")
                 let month = parseInt(dateSplit[1])
                 let year = parseInt(dateSplit[2])
