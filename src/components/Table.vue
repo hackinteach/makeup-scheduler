@@ -27,7 +27,7 @@
             </v-flex>
             <v-flex
               xs12 v-for="(cell,j) in row" :key="j" class="my-flex"
-              @click="toggle(i,j)">
+              @click="()=>toggle(i,j)">
               <v-card tile flat v-if="cell"
                       class="green">
                 <v-card-media height="20px">
@@ -52,13 +52,15 @@
 
 <script>
   import {db, auth} from '../firebase';
-
+  import * as _ from 'lodash';
   export default {
     beforeMount() {
       this.newDate();
     },
     data() {
       return {
+        cI: null,
+        cJ: null,
         days: [],
         table: [
           [false, false, false, false, false, false, false],
@@ -81,16 +83,20 @@
       }
     },
     watch:{
-      table(){
-
-      }
+      // table:  {
+      //   handler: function(newValue) {
+      //     console.log("changed from watch", newValue);
+      //   },
+      //   deep: true,
+      // }
     },
     methods: {
       toggle(i,j){
         console.log(`${i} ${j} clicked`);
         console.log(`before ${this.table[i][j]}`);
-        this.table[i][j] = !this.table[i][j];
-        console.log(`after ${this.table[i][j]}`);
+        let newTable = _.map(this.table, _.clone);
+        newTable[i][j] = !this.table[i][j];
+        this.table = newTable;
       },
 
       newDate() {
