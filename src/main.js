@@ -6,6 +6,8 @@ import router from './router'
 import Vuetify from 'vuetify'
 import 'vuetify/dist/vuetify.min.css'
 import './assets/index.css'
+import {session} from './session'
+import firebase from './firebase'
 
 Vue.use(Vuetify, {
   theme: {
@@ -18,10 +20,26 @@ Vue.use(Vuetify, {
 
 Vue.config.productionTip = false;
 
-/* eslint-disable no-new */
-new Vue({
-  el: '#app',
-  router,
-  components: { App },
-  template: '<App/>'
-});
+const unsubscribe = firebase.auth()
+  .onAuthStateChanged((firebaseUser) => {
+    new Vue({
+      el: '#app',
+      router,
+      session,
+      render: h => h(App),
+      created () {
+        if (firebaseUser) {
+          session.dispatch('autoSignIn', firebaseUser)
+        }
+      }
+    })
+    unsubscribe()
+  })
+
+// /* eslint-disable no-new */
+// new Vue({
+//   el: '#app',
+//   router,
+//   components: { App },
+//   template: '<App/>'
+// });
