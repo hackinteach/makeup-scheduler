@@ -1,20 +1,24 @@
 ![Deployment](https://circleci.com/bb/suffer4life/hackathon2.svg?style=shield&circle-token=:circle-token)
 
-# makeup-scheduler
+# Makeup-scheduler
 
-> A Vue.js project
+> Realtime makeup class scheduler using Firebase and Vue JS
+
+## More Stuffs to Add
+1. Delete users and session when session is ended.
+2. As you can think of
 
 ## Build Setup
 
 ``` bash
 # install dependencies
-npm install
+yarn install
 
 # serve with hot reload at localhost:8080
-npm run dev
+yarn start
 
 # build for production with minification
-npm run build
+yarn build
 
 # build for production and view the bundle analyzer report
 npm run build --report
